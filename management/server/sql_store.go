@@ -32,7 +32,7 @@ import (
 	"github.com/netbirdio/netbird/management/server/telemetry"
 	"github.com/netbirdio/netbird/route"
 )
-
+//
 const (
 	storeSqliteFileName        = "store.db"
 	idQueryCondition           = "id = ?"

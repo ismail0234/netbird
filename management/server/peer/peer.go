@@ -51,7 +51,7 @@ type Peer struct {
 
 type PeerStatus struct { //nolint:revive
 	// LastSeen is the last time peer was connected to the management service
-	LastSeen time.Time
+	LastSeen time.Time `gorm:"default:0001"`
 	// Connected indicates whether peer is connected to the management service or not
 	Connected bool
 	// LoginExpired

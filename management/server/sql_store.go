@@ -1061,10 +1061,7 @@ func (u *User) BeforeSave(tx *gorm.DB) (err error) {
 	return nil
 }
 
-func (u *SetupKey) BeforeSave(tx *gorm.DB) (err error) {
-	log.Printf("BeforeSave - SetupKey: %s", u.Key)
-	return nil
-}
+
 func (u *SetupKey) BeforeSave(tx *gorm.DB) (err error) {
 	if u.LastUsed.IsZero() {
 		u.LastUsed = time.Date(0001, 1, 1, 1, 1, 1, 1, time.Local)

@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"database/sql"
 	"crypto/sha256"
 	b64 "encoding/base64"
 	"fmt"

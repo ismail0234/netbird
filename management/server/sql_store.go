@@ -1056,6 +1056,16 @@ func NewMysqlStore(ctx context.Context, dsn string, metrics telemetry.AppMetrics
 	return NewSqlStore(ctx, db, MysqlStoreEngine, metrics)
 }
 
+func (u *User) BeforeSave(tx *gorm.DB) (err error) {
+	log.Printf("BeforeSave - User: %s", u.Id)
+	return nil
+}
+
+func (u *SetupKey) BeforeSave(tx *gorm.DB) (err error) {
+	log.Printf("BeforeSave - SetupKey: %s", u.Key)
+	return nil
+}
+
 func getGormConfig() *gorm.Config {
 	return &gorm.Config{
 		Logger:          logger.Default.LogMode(logger.Silent),

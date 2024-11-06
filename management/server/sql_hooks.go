@@ -17,7 +17,7 @@ type PeerStatusChildren struct {
 }
 
 func GetDefaultTimezone() time.Time {
-	return time.Date(1, 1, 1, 1, 1, 1, 0, time.Local)
+	return time.Date(1, 1, 1, 0, 0, 0, 0, time.Local)
 }
 
 func (row *SetupKey) BeforeSave(tx *gorm.DB) (err error) {

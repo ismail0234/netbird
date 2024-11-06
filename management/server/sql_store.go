@@ -144,6 +144,8 @@ func (s *SqlStore) AcquireReadLockByUID(ctx context.Context, uniqueID string) (u
 }
 
 func (s *SqlStore) SaveAccount(ctx context.Context, account *Account) error {
+
+	log.Printf("SaveAccount - 1")
 	start := time.Now()
 	defer func() {
 		elapsed := time.Since(start)
@@ -155,31 +157,64 @@ func (s *SqlStore) SaveAccount(ctx context.Context, account *Account) error {
 	// todo: remove this check after the issue is resolved
 	s.checkAccountDomainBeforeSave(ctx, account.Id, account.Domain)
 
+	log.Printf("SaveAccount - 2")
 	generateAccountSQLTypes(account)
 
+	log.Printf("SaveAccount - 3")
 	err := s.db.Transaction(func(tx *gorm.DB) error {
+
+		log.Printf("SaveAccount - 4")
 		result := tx.Select(clause.Associations).Delete(account.Policies, "account_id = ?", account.Id)
 		if result.Error != nil {
 			return result.Error
 		}
+		log.Printf("SaveAccount - 5")
 
 		result = tx.Select(clause.Associations).Delete(account.UsersG, "account_id = ?", account.Id)
 		if result.Error != nil {
 			return result.Error
 		}
+		log.Printf("SaveAccount - 6")
 
 		result = tx.Select(clause.Associations).Delete(account)
 		if result.Error != nil {
 			return result.Error
+		}
+		log.Printf("SaveAccount - 7 => Peers: %d, users: %d, UsersG: %d", len(account.Peers), len(account.Users), len(account.UsersG))
+
+		for _, key := range account.SetupKeys {
+			log.Printf("SaveAccount - SetupKeys: %s", key.LastUsed)
+		}
+
+		for _, peer := range account.Peers {
+			log.Printf("SaveAccount - LastLogin: %s", peer.LastLogin)
+		}
+
+		for _, user := range account.Users {
+
+			log.Printf("SaveAccount - Users: %s", user.LastLogin)
+
+			for _, pat := range user.PATs {
+				log.Printf("SaveAccount - PATs: %s", pat.LastUsed)
+			}
+		}
+
+		for _, user := range account.UsersG {
+			log.Printf("SaveAccount - UsersG: %s", user.LastLogin)
 		}
 
 		result = tx.
 			Session(&gorm.Session{FullSaveAssociations: true}).
 			Clauses(clause.OnConflict{UpdateAll: true}).
 			Create(account)
+
+		log.Printf("SaveAccount - 8")
+
 		if result.Error != nil {
 			return result.Error
 		}
+
+		log.Printf("SaveAccount - 9")
 		return nil
 	})
 

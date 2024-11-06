@@ -16,12 +16,6 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
-type MySQLContainer2 struct {
-	username string
-	password string
-	database string
-}
-
 func CreatePGDB() (func(), error) {
 
 	log.Printf("[DEBUG] CreatePGDB")
@@ -71,7 +65,7 @@ func CreateMyDB() (func(), error) {
 
 	log.Printf("[DEBUG] CreateMyDB SCS:")
 
-	if container != nil {
+	if container == nil {
 		return nil, nil
 	}
 

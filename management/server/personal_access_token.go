@@ -35,7 +35,7 @@ type PersonalAccessToken struct {
 	// scope could be added in future
 	CreatedBy string
 	CreatedAt time.Time
-	LastUsed time.Time `gorm:"default:2000"`
+	LastUsed time.Time `gorm:"default:0001"`
 }
 
 func (t *PersonalAccessToken) Copy() *PersonalAccessToken {

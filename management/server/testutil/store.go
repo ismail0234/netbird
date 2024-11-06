@@ -10,6 +10,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/modules/mysql"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
 )
@@ -66,6 +67,8 @@ func CreateMyDB() (func(), error) {
 	if container != nil {
 		return nil, nil
 	}
+	
+	mysql.WithPassword()
 
 	return nil, nil
 }

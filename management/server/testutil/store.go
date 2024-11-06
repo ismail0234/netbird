@@ -45,14 +45,10 @@ func CreateMyDB() (func(), error) {
 		mysql.WithPassword("mysql"),
 	)
 
-	log.Printf("[DEBUG] CreateMyDB - 2")
-
 	if err != nil {
 		log.Printf("[DEBUG] CreateMyDB Error: %s", err)
 		return nil, err
 	}
-
-	log.Printf("[DEBUG] CreateMyDB - 3")
 
 	talksConn, err := c.ConnectionString(ctx)
 

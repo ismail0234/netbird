@@ -2,7 +2,6 @@ package server
 
 import (
 	"crypto/sha256"
-	"database/sql"
 	b64 "encoding/base64"
 	"fmt"
 	"hash/crc32"
@@ -36,7 +35,7 @@ type PersonalAccessToken struct {
 	// scope could be added in future
 	CreatedBy string
 	CreatedAt time.Time
-	LastUsed  sql.NullTime
+	LastUsed time.Time `gorm:"default:2000"`
 }
 
 func (t *PersonalAccessToken) Copy() *PersonalAccessToken {

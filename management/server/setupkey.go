@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"database/sql"
 	"crypto/sha256"
 	b64 "encoding/base64"
 	"fmt"
@@ -82,7 +81,7 @@ type SetupKey struct {
 	Type      SetupKeyType
 	CreatedAt time.Time
 	ExpiresAt time.Time
-	UpdatedAt sql.NullTime
+	UpdatedAt time.Time
 	// Revoked indicates whether the key was revoked or not (we don't remove them for tracking purposes)
 	Revoked bool
 	// UsedTimes indicates how many times the key was used

@@ -88,7 +88,6 @@ type SetupKey struct {
 	UsedTimes int
 	// LastUsed last time the key was used for peer registration
 	LastUsed time.Time `gorm:"default:null"`
-	
 	// AutoGroups is a list of Group IDs that are auto assigned to a Peer when it uses this key to register
 	AutoGroups []string `gorm:"serializer:json"`
 	// UsageLimit indicates the number of times this key can be used to enroll a machine.

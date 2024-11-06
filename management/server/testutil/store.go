@@ -39,13 +39,13 @@ func CreateMyDB() (func(), error) {
 
 	ctx := context.Background()
 	c, err := mysql.Run(ctx,
-		"mysql:8.0.36",
+		"mysql:8.0.40",
 		mysql.WithDatabase("netbird"),
 		mysql.WithUsername("netbird"),
 		mysql.WithPassword("mysql"),
-		testcontainers.WithWaitStrategy(
+		testcontainers.WithWaitStrategyAndDeadline(300*time.Second,
 			wait.ForLog("database system is ready to accept connections").
-				WithOccurrence(3).WithStartupTimeout(300*time.Second)),
+				WithOccurrence(1).WithStartupTimeout(30*time.Second)),
 	)
 
 	log.Printf("[DEBUG] CreateMyDB - 2")

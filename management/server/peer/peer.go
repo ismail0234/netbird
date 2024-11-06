@@ -40,7 +40,7 @@ type Peer struct {
 
 	InactivityExpirationEnabled bool
 	// LastLogin the time when peer performed last login operation
-	LastLogin time.Time
+	LastLogin time.Time `gorm:"default:0001"`
 	// CreatedAt records the time the peer was created
 	CreatedAt time.Time
 	// Indicate ephemeral peer attribute

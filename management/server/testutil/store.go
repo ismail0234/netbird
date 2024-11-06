@@ -5,6 +5,7 @@ package testutil
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"time"
 
@@ -14,6 +15,12 @@ import (
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
 )
+
+type MySQLContainer2 struct {
+	username string
+	password string
+	database string
+}
 
 func CreatePGDB() (func(), error) {
 
@@ -61,7 +68,7 @@ func CreateMyDB() (func(), error) {
 		log.Printf("[DEBUG] CreateMyDB ErrorX: %s", err)
 		return nil, err
 	}
-	
+
 	log.Printf("[DEBUG] CreateMyDB SCS:")
 
 	if container != nil {
@@ -70,7 +77,32 @@ func CreateMyDB() (func(), error) {
 
 	mysql.WithPassword("c")
 
-	return nil, nil
+	talksConn, err := ConnectionString(ctx, container, req.Env["MYSQL_USER"], req.Env["MYSQL_DATABASE"], req.Env["MYSQL_PASSWORD"])
+
+	log.Printf("[DEBUG] CreateMyDB - ConnectionString: %s, Error: %s", talksConn, err)
+
+	return GetContextDB(ctx, container, talksConn, err, "NETBIRD_STORE_ENGINE_MYSQL_DSN")
+}
+
+func ConnectionString(ctx context.Context, c testcontainers.Container, user string, db string, pass string) (string, error) {
+	containerPort, err := c.MappedPort(ctx, "3306/tcp")
+	if err != nil {
+		return "", err
+	}
+
+	host, err := c.Host(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	extraArgs := ""
+
+	if extraArgs != "" {
+		extraArgs = "?" + extraArgs
+	}
+
+	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s%s", user, pass, host, containerPort.Port(), db, extraArgs)
+	return connectionString, nil
 }
 
 func GetContextDB(ctx context.Context, c testcontainers.Container, talksConn string, err error, dsn string) (func(), error) {

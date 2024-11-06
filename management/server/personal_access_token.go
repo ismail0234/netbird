@@ -2,6 +2,7 @@ package server
 
 import (
 	"crypto/sha256"
+	"database/sql"
 	b64 "encoding/base64"
 	"fmt"
 	"hash/crc32"

@@ -37,31 +37,38 @@ func CreateMyDB() (func(), error) {
 
 	log.Printf("[DEBUG] CreateMyDB")
 
-	ctx := context.Background()
-	c, err := mysql.Run(ctx,
-		"mysql:8.0.40",
-		mysql.WithDatabase("netbird"),
-		mysql.WithUsername("netbird"),
-		mysql.WithPassword("mysql"),
-		testcontainers.WithWaitStrategyAndDeadline(300*time.Second,
-			wait.ForLog("database system is ready to accept connections").
-				WithOccurrence(2).WithStartupTimeout(300*time.Second)),
-	)
-
-	log.Printf("[DEBUG] CreateMyDB - 2")
-
-	if err != nil {
-		log.Printf("[DEBUG] CreateMyDB Error: %s", err)
-		return nil, err
+	req := testcontainers.ContainerRequest{
+		Image:        "mysql:8.0.40",
+		ExposedPorts: []string{"3306/tcp"},
+		Env: map[string]string{
+			"MYSQL_USER":          "netbird",
+			"MYSQL_PASSWORD":      "mysql",
+			"MYSQL_ROOT_PASSWORD": "mysqlroot",
+			"MYSQL_DATABASE":      "netbird",
+		},
+		WaitingFor: wait.ForLog("port: 3306  MySQL Community Server"),
 	}
 
-	log.Printf("[DEBUG] CreateMyDB - 3")
+	genericContainerReq := testcontainers.GenericContainerRequest{
+		ContainerRequest: req,
+		Started:          true,
+	}
 
-	talksConn, err := c.ConnectionString(ctx)
+	ctx := context.Background()
+	container, err := testcontainers.GenericContainer(ctx, genericContainerReq)
 
-	log.Printf("[DEBUG] CreateMyDB - ConnectionString: %s, Error: %s", talksConn, err)
+	if err != nil {
+		log.Printf("[DEBUG] CreateMyDB ErrorX: %s", err)
+		return nil, err
+	}
+	
+	log.Printf("[DEBUG] CreateMyDB SCS:")
 
-	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_MYSQL_DSN")
+	if container != nil {
+		return nil, nil
+	}
+
+	return nil, nil
 }
 
 func GetContextDB(ctx context.Context, c testcontainers.Container, talksConn string, err error, dsn string) (func(), error) {

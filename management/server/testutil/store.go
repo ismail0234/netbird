@@ -39,10 +39,10 @@ func CreateMyDB() (func(), error) {
 
 	ctx := context.Background()
 	c, err := mysql.Run(ctx,
-		"mysql:8.0.36",
+		"mysql:8.0.40",
 		mysql.WithDatabase("netbird"),
 		mysql.WithUsername("netbird"),
-		mysql.WithPassword("mysql")),
+		mysql.WithPassword("mysql"))
 	)
 
 	log.Printf("[DEBUG] CreateMyDB - 2")

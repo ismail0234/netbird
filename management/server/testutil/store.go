@@ -45,7 +45,7 @@ func CreateMyDB() (func(), error) {
 		mysql.WithPassword("mysql"),
 		testcontainers.WithWaitStrategy(
 			wait.ForLog("database system is ready to accept connections").
-				WithOccurrence(3).WithStartupTimeout(30*time.Second)),
+				WithOccurrence(3).WithStartupTimeout(300*time.Second)),
 	)
 
 	log.Printf("[DEBUG] CreateMyDB - 2")

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"log"
 	"time"
 
 	nbpeer "github.com/netbirdio/netbird/management/server/peer"
@@ -73,7 +74,13 @@ func (row *User) BeforeSave(tx *gorm.DB) (err error) {
 	}
 
 	if row.LastLogin.IsZero() {
+		log.Printf("row.LastLogin - User - 1: %s", row.LastLogin)
+
 		row.LastLogin = GetDefaultTimezone()
+
+		log.Printf("row.LastLogin - User - 2: %s", row.LastLogin)
+	} else {
+		log.Printf("row.LastLogin - User - 3: %s", row.LastLogin)
 	}
 
 	return nil
@@ -82,7 +89,13 @@ func (row *User) BeforeSave(tx *gorm.DB) (err error) {
 func (row *UserInfo) BeforeSave(tx *gorm.DB) (err error) {
 
 	if row.LastLogin.IsZero() {
+		log.Printf("row.LastLogin - UserInfo - 1: %s", row.LastLogin)
+
 		row.LastLogin = GetDefaultTimezone()
+
+		log.Printf("row.LastLogin - UserInfo - 2: %s", row.LastLogin)
+	} else {
+		log.Printf("row.LastLogin - UserInfo - 3: %s", row.LastLogin)
 	}
 
 	return nil
@@ -95,7 +108,13 @@ func (row *PeerChildren) BeforeSave(tx *gorm.DB) (err error) {
 	}
 
 	if row.LastLogin.IsZero() {
+		log.Printf("row.LastLogin - PeerChildren - 1: %s", row.LastLogin)
+
 		row.LastLogin = GetDefaultTimezone()
+
+		log.Printf("row.LastLogin - PeerChildren - 2: %s", row.LastLogin)
+	} else {
+		log.Printf("row.LastLogin - PeerChildren - 3: %s", row.LastLogin)
 	}
 
 	return nil

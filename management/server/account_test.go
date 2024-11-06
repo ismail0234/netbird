@@ -6,6 +6,7 @@ import (
 	b64 "encoding/base64"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net"
 	"reflect"
 	"sync"
@@ -2578,6 +2579,10 @@ func TestAccount_SetJWTGroups(t *testing.T) {
 			"user2": {Id: "user2", AccountID: "accountID"},
 		},
 	}
+
+	log.Printf("TEST: TestAccount_SetJWTGroups")
+	log.Printf("TEST: TestAccount_SetJWTGroups 2: %s", account.Peers["peer1"].LastLogin)
+	log.Printf("TEST: TestAccount_SetJWTGroups 3: %s", account.Users["user1"].LastLogin)
 
 	assert.NoError(t, manager.Store.SaveAccount(context.Background(), account), "unable to save account")
 

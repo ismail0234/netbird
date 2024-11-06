@@ -67,8 +67,8 @@ func CreateMyDB() (func(), error) {
 	if container != nil {
 		return nil, nil
 	}
-	
-	mysql.WithPassword()
+
+	mysql.WithPassword("c")
 
 	return nil, nil
 }

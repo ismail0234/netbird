@@ -44,9 +44,6 @@ func CreateMyDB() (func(), error) {
 		mysql.WithDatabase("netbird"),
 		mysql.WithUsername("netbird"),
 		mysql.WithPassword("mysql"),
-		testcontainers.WithWaitStrategy(
-			wait.ForLog("port: 3306  MySQL Community Server").
-				WithOccurrence(2).WithStartupTimeout(15*time.Second)),
 	)
 
 	if err != nil {

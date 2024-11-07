@@ -40,7 +40,6 @@ func (row *SetupKey) BeforeSave(tx *gorm.DB) (err error) {
 
 	return nil
 }
-
 func (row *Account) BeforeSave(tx *gorm.DB) (err error) {
 
 	if row.CreatedAt.IsZero() {

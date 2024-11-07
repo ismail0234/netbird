@@ -227,7 +227,7 @@ func (s *SqlStore) SaveAccount(ctx context.Context, account *Account) error {
 					Create(account)
 			})
 
-			log.Printf("SaveAccount - SQL: %s", result.Error, sqlCode)
+			log.Printf("SaveAccount - SQL: %s", sqlCode)
 			return result.Error
 		}
 

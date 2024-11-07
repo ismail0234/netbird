@@ -1273,9 +1273,10 @@ func (am *DefaultAccountManager) peerInactivityExpirationJob(ctx context.Context
 // checkAndSchedulePeerInactivityExpiration periodically checks for inactive peers to end their sessions
 func (am *DefaultAccountManager) checkAndSchedulePeerInactivityExpiration(ctx context.Context, account *Account) {
 	am.peerInactivityExpiry.Cancel(ctx, []string{account.Id})
-	/*if nextRun, ok := account.GetNextInactivePeerExpiration(); ok {
+	if nextRun, ok := account.GetNextInactivePeerExpiration(); ok {
+		log.Printf("SCHEDULE ==> " + account.Id)
 		go am.peerInactivityExpiry.Schedule(ctx, nextRun, account.Id, am.peerInactivityExpirationJob(ctx, account.Id))
-	}*/
+	}
 }
 
 // newAccount creates a new Account with a generated ID and generated default setup keys.

@@ -680,6 +680,25 @@ func (s *SqlStore) GetAccount(ctx context.Context, accountID string) (*Account, 
 	}()
 
 	var account Account
+
+	sqlQuery := s.db.ToSQL(func(tx2 *gorm.DB) *gorm.DB {
+		return tx2.Model(&account).
+			Preload("UsersG.PATsG"). // have to be specifies as this is nester reference
+			Preload(clause.Associations).
+			First(&account, idQueryCondition, accountID)
+	})
+
+	log.WithContext(ctx).Printf("GetAccount - sqlQuery: %s", sqlQuery)
+
+	sqlXY, errX := s.db.DB()
+	if errX != nil {
+		log.WithContext(ctx).Printf("GetAccount - NULL DB")
+	} else {
+		if err := sqlXY.Ping(); err != nil {
+			log.WithContext(ctx).Printf("GetAccount - PING ERR: %s", err.Error())
+		}
+	}
+
 	result := s.db.Model(&account).
 		Preload("UsersG.PATsG"). // have to be specifies as this is nester reference
 		Preload(clause.Associations).

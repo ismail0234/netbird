@@ -50,12 +50,14 @@ func fileExists(filename string) string {
 func CreateMyDB() (func(), error) {
 
 	filename := "mysql.cnf"
+	wd, _ := os.Getwd()
 
 	log.Printf("mysql: %s", fileExists(filepath.Join("..", "server", "testdata", filename)))
 	log.Printf("mysql 1: %s", fileExists(filepath.Join("server", "testdata", filename)))
 	log.Printf("mysql 2: %s", fileExists(filepath.Join("..", "testdata", filename)))
 	log.Printf("mysql 3: %s", fileExists(filepath.Join("testdata", filename)))
 	log.Printf("mysql 4: %s", fileExists(filepath.Join(filename)))
+	log.Printf("WD: %s", wd)
 
 	ctx := context.Background()
 	c, err := mysql.Run(ctx,

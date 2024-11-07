@@ -688,7 +688,7 @@ func (s *SqlStore) GetAccount(ctx context.Context, accountID string) (*Account, 
 			First(&account, idQueryCondition, accountID)
 	})
 
-	log.WithContext(ctx).Printf("GetAccount - sqlQuery: %s", sqlQuery)
+	log.WithContext(ctx).Printf("GetAccount - Engine: %s, sqlQuery: %s", s.storeEngine, sqlQuery)
 
 	sqlXY, errX := s.db.DB()
 	if errX != nil {

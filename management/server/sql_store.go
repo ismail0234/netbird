@@ -36,7 +36,8 @@ import (
 const (
 	storeSqliteFileName        = "store.db"
 	idQueryCondition           = "id = ?"
-	keyQueryCondition          = "`key` = ?"
+	keyQueryCondition          = "key = ?"
+	mysqlKeyQueryCondition     = "`key` = ?"
 	accountAndIDQueryCondition = "account_id = ? and id = ?"
 	accountIDCondition         = "account_id = ?"
 	peerNotFoundFMT            = "peer %s not found"
@@ -534,11 +535,20 @@ func (s *SqlStore) GetAccountIDByPrivateDomain(ctx context.Context, lockStrength
 	return accountID, nil
 }
 
+func GetKeyQueryCondition(storeEngine StoreEngine) string {
+
+	if storeEngine == MysqlStoreEngine {
+		return mysqlKeyQueryCondition
+	}
+
+	return keyQueryCondition
+}
+
 func (s *SqlStore) GetAccountBySetupKey(ctx context.Context, setupKey string) (*Account, error) {
 	startTime := time.Now()
 
 	var key SetupKey
-	result := s.db.WithContext(ctx).Select("account_id").First(&key, keyQueryCondition, setupKey)
+	result := s.db.WithContext(ctx).Select("account_id").First(&key, GetKeyQueryCondition(s.storeEngine), setupKey)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, status.Errorf(status.NotFound, "account not found: index lookup failed")
@@ -824,7 +834,7 @@ func (s *SqlStore) GetAccountByPeerPubKey(ctx context.Context, peerKey string) (
 	startTime := time.Now()
 
 	var peer nbpeer.Peer
-	result := s.db.WithContext(ctx).Select("account_id").First(&peer, keyQueryCondition, peerKey)
+	result := s.db.WithContext(ctx).Select("account_id").First(&peer, GetKeyQueryCondition(s.storeEngine), peerKey)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, status.Errorf(status.NotFound, "account not found: index lookup failed")
@@ -847,7 +857,7 @@ func (s *SqlStore) GetAccountIDByPeerPubKey(ctx context.Context, peerKey string)
 
 	var peer nbpeer.Peer
 	var accountID string
-	result := s.db.WithContext(ctx).Model(&peer).Select("account_id").Where(keyQueryCondition, peerKey).First(&accountID)
+	result := s.db.WithContext(ctx).Model(&peer).Select("account_id").Where(GetKeyQueryCondition(s.storeEngine), peerKey).First(&accountID)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return "", status.Errorf(status.NotFound, "account not found: index lookup failed")
@@ -883,7 +893,7 @@ func (s *SqlStore) GetAccountIDBySetupKey(ctx context.Context, setupKey string) 
 	startTime := time.Now()
 
 	var accountID string
-	result := s.db.WithContext(ctx).Model(&SetupKey{}).Select("account_id").Where(keyQueryCondition, setupKey).First(&accountID)
+	result := s.db.WithContext(ctx).Model(&SetupKey{}).Select("account_id").Where(GetKeyQueryCondition(s.storeEngine), setupKey).First(&accountID)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return "", status.Errorf(status.NotFound, "account not found: index lookup failed")
@@ -975,7 +985,7 @@ func (s *SqlStore) GetPeerByPeerPubKey(ctx context.Context, lockStrength Locking
 	startTime := time.Now()
 
 	var peer nbpeer.Peer
-	result := s.db.WithContext(ctx).Clauses(clause.Locking{Strength: string(lockStrength)}).First(&peer, keyQueryCondition, peerKey)
+	result := s.db.WithContext(ctx).Clauses(clause.Locking{Strength: string(lockStrength)}).First(&peer, GetKeyQueryCondition(s.storeEngine), peerKey)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, status.Errorf(status.NotFound, "peer not found")
@@ -1193,7 +1203,7 @@ func (s *SqlStore) GetSetupKeyBySecret(ctx context.Context, lockStrength Locking
 
 	var setupKey SetupKey
 	result := s.db.WithContext(ctx).Clauses(clause.Locking{Strength: string(lockStrength)}).
-		First(&setupKey, keyQueryCondition, key)
+		First(&setupKey, GetKeyQueryCondition(s.storeEngine), key)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, status.Errorf(status.NotFound, "setup key not found")

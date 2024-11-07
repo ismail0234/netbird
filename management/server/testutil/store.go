@@ -45,7 +45,7 @@ func CreateMyDB() (func(), error) {
 	if fileExists(mysqlConfigPath) {
 		log.Printf("MySQL Config fileExists: Yes")
 	} else {
-		log.Printf("MySQL Config fileExists: No")
+		log.Printf("MySQL Config fileExists: No => %s", mysqlConfigPath)
 	}
 
 	ctx := context.Background()

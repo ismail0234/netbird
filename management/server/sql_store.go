@@ -547,7 +547,7 @@ func GetKeyQueryCondition(storeEngine StoreEngine) string {
 func (s *SqlStore) GetAccountBySetupKey(ctx context.Context, setupKey string) (*Account, error) {
 	startTime := time.Now()
 
-	log.Printf("QUERY => %s", GetKeyQueryCondition(s.GetStoreEngine()))
+	log.Printf("GetAccountBySetupKey => %s, GetStoreEngine: %s", GetKeyQueryCondition(s.GetStoreEngine()), s.GetStoreEngine())
 
 	var key SetupKey
 	result := s.db.WithContext(ctx).Select("account_id").First(&key, GetKeyQueryCondition(s.GetStoreEngine()), setupKey)
@@ -835,6 +835,8 @@ func (s *SqlStore) GetAccountByPeerID(ctx context.Context, peerID string) (*Acco
 func (s *SqlStore) GetAccountByPeerPubKey(ctx context.Context, peerKey string) (*Account, error) {
 	startTime := time.Now()
 
+	log.Printf("GetAccountByPeerPubKey => %s, GetStoreEngine: %s", GetKeyQueryCondition(s.GetStoreEngine()), s.GetStoreEngine())
+
 	var peer nbpeer.Peer
 	result := s.db.WithContext(ctx).Select("account_id").First(&peer, GetKeyQueryCondition(s.GetStoreEngine()), peerKey)
 	if result.Error != nil {
@@ -856,6 +858,8 @@ func (s *SqlStore) GetAccountByPeerPubKey(ctx context.Context, peerKey string) (
 
 func (s *SqlStore) GetAccountIDByPeerPubKey(ctx context.Context, peerKey string) (string, error) {
 	startTime := time.Now()
+
+	log.Printf("GetAccountIDByPeerPubKey => %s, GetStoreEngine: %s", GetKeyQueryCondition(s.GetStoreEngine()), s.GetStoreEngine())
 
 	var peer nbpeer.Peer
 	var accountID string
@@ -893,6 +897,8 @@ func (s *SqlStore) GetAccountIDByUserID(userID string) (string, error) {
 
 func (s *SqlStore) GetAccountIDBySetupKey(ctx context.Context, setupKey string) (string, error) {
 	startTime := time.Now()
+
+	log.Printf("GetAccountIDBySetupKey => %s, GetStoreEngine: %s", GetKeyQueryCondition(s.GetStoreEngine()), s.GetStoreEngine())
 
 	var accountID string
 	result := s.db.WithContext(ctx).Model(&SetupKey{}).Select("account_id").Where(GetKeyQueryCondition(s.GetStoreEngine()), setupKey).First(&accountID)
@@ -985,6 +991,8 @@ func (s *SqlStore) GetAccountNetwork(ctx context.Context, lockStrength LockingSt
 
 func (s *SqlStore) GetPeerByPeerPubKey(ctx context.Context, lockStrength LockingStrength, peerKey string) (*nbpeer.Peer, error) {
 	startTime := time.Now()
+
+	log.Printf("GetPeerByPeerPubKey => %s, GetStoreEngine: %s", GetKeyQueryCondition(s.GetStoreEngine()), s.GetStoreEngine())
 
 	var peer nbpeer.Peer
 	result := s.db.WithContext(ctx).Clauses(clause.Locking{Strength: string(lockStrength)}).First(&peer, GetKeyQueryCondition(s.GetStoreEngine()), peerKey)
@@ -1202,6 +1210,8 @@ func NewMysqlStoreFromSqlStore(ctx context.Context, sqliteStore *SqlStore, dsn s
 
 func (s *SqlStore) GetSetupKeyBySecret(ctx context.Context, lockStrength LockingStrength, key string) (*SetupKey, error) {
 	startTime := time.Now()
+
+	log.Printf("GetSetupKeyBySecret => %s, GetStoreEngine: %s", GetKeyQueryCondition(s.GetStoreEngine()), s.GetStoreEngine())
 
 	var setupKey SetupKey
 	result := s.db.WithContext(ctx).Clauses(clause.Locking{Strength: string(lockStrength)}).

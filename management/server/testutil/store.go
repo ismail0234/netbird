@@ -33,19 +33,24 @@ func CreatePGDB() (func(), error) {
 	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_POSTGRES_DSN")
 }
 
-func fileExists(filename string) bool {
+func fileExists(filename string) string {
 	info, err := os.Stat(filename)
 	if os.IsNotExist(err) {
-		return false
+		return "NO"
 	}
-	return !info.IsDir()
+
+	if info.IsDir() {
+		return "YES"
+	}
+
+	return "NO"
 }
 
 func CreateMyDB() (func(), error) {
 
-	log.Printf("mysql: %d", fileExists("../testdata/mysql.cnf"))
-	log.Printf("mysql2: %d", fileExists("mysql.cnf"))
-	log.Printf("mysql3: %d", fileExists("testdata/mysql.cnf"))
+	log.Printf("mysql: %s", fileExists("../testdata/mysql.cnf"))
+	log.Printf("mysql2: %s", fileExists("mysql.cnf"))
+	log.Printf("mysql3: %s", fileExists("testdata/mysql.cnf"))
 
 	ctx := context.Background()
 	c, err := mysql.Run(ctx,

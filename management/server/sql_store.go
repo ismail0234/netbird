@@ -547,8 +547,10 @@ func GetKeyQueryCondition(storeEngine StoreEngine) string {
 func (s *SqlStore) GetAccountBySetupKey(ctx context.Context, setupKey string) (*Account, error) {
 	startTime := time.Now()
 
+	log.Printf("QUERY => %s", GetKeyQueryCondition(s.GetStoreEngine()))
+
 	var key SetupKey
-	result := s.db.WithContext(ctx).Select("account_id").First(&key, GetKeyQueryCondition(s.storeEngine), setupKey)
+	result := s.db.WithContext(ctx).Select("account_id").First(&key, GetKeyQueryCondition(s.GetStoreEngine()), setupKey)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, status.Errorf(status.NotFound, "account not found: index lookup failed")

@@ -220,8 +220,8 @@ func (s *SqlStore) SaveAccount(ctx context.Context, account *Account) error {
 		if result.Error != nil {
 			log.Printf("SaveAccount - Error: %s", result.Error)
 
-			sqlCode := tx.ToSQL(func(tx *gorm.DB) *gorm.DB {
-				return tx.
+			sqlCode := tx.ToSQL(func(tx2 *gorm.DB) *gorm.DB {
+				return tx2.
 					Session(&gorm.Session{FullSaveAssociations: true}).
 					Clauses(clause.OnConflict{UpdateAll: true}).
 					Create(account)

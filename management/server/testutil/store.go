@@ -33,52 +33,14 @@ func CreatePGDB() (func(), error) {
 	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_POSTGRES_DSN")
 }
 
-func fileExists(filename string) bool {
-	_, err := os.Stat(filename)
-	return os.IsExist(err)
-}
-
 func CreateMyDB() (func(), error) {
 
 	mysqlConfigPath := "../../management/server/testdata/mysql.cnf"
-	mysqlConfigPath2 := "../management/server/testdata/mysql.cnf"
-	mysqlConfigPath3 := "../server/testdata/mysql.cnf"
-	mysqlConfigPath4 := "../../server/testdata/mysql.cnf"
-	pwd, _ := os.Getwd()
-
-	foundPath := "x"
-
-	if fileExists(mysqlConfigPath) {
-		foundPath = mysqlConfigPath
-		log.Printf("MySQL Config fileExists: Yes")
-	} else {
-		log.Printf("MySQL Config fileExists: No => %s", pwd)
-
-		if fileExists(mysqlConfigPath2) {
-			foundPath = mysqlConfigPath2
-			log.Printf("MySQL Config fileExists2: Yes")
-		} else {
-			log.Printf("MySQL Config fileExists2: No => %s", pwd)
-			if fileExists(mysqlConfigPath3) {
-				foundPath = mysqlConfigPath3
-				log.Printf("MySQL Config fileExists3: Yes")
-			} else {
-				log.Printf("MySQL Config fileExists3: No => %s", pwd)
-				if fileExists(mysqlConfigPath4) {
-					foundPath = mysqlConfigPath4
-					log.Printf("MySQL Config fileExists4: Yes")
-				} else {
-					log.Printf("MySQL Config fileExists4: No => %s", pwd)
-					return nil, nil
-				}
-			}
-		}
-	}
 
 	ctx := context.Background()
 	c, err := mysql.Run(ctx,
 		"mysql:8.0.40",
-		mysql.WithConfigFile(foundPath),
+		mysql.WithConfigFile(mysqlConfigPath),
 		mysql.WithDatabase("netbird"),
 		mysql.WithUsername("netbird"),
 		mysql.WithPassword("mysql"),

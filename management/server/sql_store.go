@@ -83,8 +83,10 @@ func NewSqlStore(ctx context.Context, db *gorm.DB, storeEngine StoreEngine, metr
 	log.WithContext(ctx).Infof("Set max open db connections to %d", conns)
 
 	if storeEngine == MysqlStoreEngine {
-		sql.SetConnMaxLifetime(time.Second * 30)
-		sql.SetMaxIdleConns(conns)
+		sql.SetConnMaxLifetime(time.Second * 120)
+		sql.SetConnMaxIdleTime(time.Second * 120)
+		sql.SetMaxIdleConns(10)
+		sql.SetMaxOpenConns(10)
 	}
 
 	log.Infof("Set max open db connections to %d", conns)

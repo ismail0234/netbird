@@ -1759,7 +1759,7 @@ func TestDefaultAccountManager_UpdatePeer_PeerLoginExpiration(t *testing.T) {
 	err = manager.MarkPeerConnected(context.Background(), key.PublicKey().String(), true, nil, account)
 	require.NoError(t, err, "unable to mark peer connected")
 
-	log.Printf("[DEBUG] TestDefaultAccountManager_UpdatePeer_PeerLoginExpiration");
+	log.Printf("[DEBUG] TestDefaultAccountManager_UpdatePeer_PeerLoginExpiration")
 	account, err = manager.UpdateAccountSettings(context.Background(), accountID, userID, &Settings{
 		PeerLoginExpiration:        time.Hour,
 		PeerLoginExpirationEnabled: true,
@@ -1808,8 +1808,8 @@ func TestDefaultAccountManager_MarkPeerConnected_PeerLoginExpiration(t *testing.
 		LoginExpirationEnabled: true,
 	})
 	require.NoError(t, err, "unable to add peer")
-	
-	log.Printf("[DEBUG] TestDefaultAccountManager_MarkPeerConnected_PeerLoginExpiration");
+
+	log.Printf("[DEBUG] TestDefaultAccountManager_MarkPeerConnected_PeerLoginExpiration")
 	_, err = manager.UpdateAccountSettings(context.Background(), accountID, userID, &Settings{
 		PeerLoginExpiration:        time.Hour,
 		PeerLoginExpirationEnabled: true,
@@ -1879,8 +1879,8 @@ func TestDefaultAccountManager_UpdateAccountSettings_PeerLoginExpiration(t *test
 		},
 	}
 	// enabling PeerLoginExpirationEnabled should trigger the expiration job
-	
-	log.Printf("[DEBUG] TestDefaultAccountManager_UpdateAccountSettings_PeerLoginExpiration 1");
+
+	log.Printf("[DEBUG] TestDefaultAccountManager_UpdateAccountSettings_PeerLoginExpiration 1")
 	account, err = manager.UpdateAccountSettings(context.Background(), account.Id, userID, &Settings{
 		PeerLoginExpiration:        time.Hour,
 		PeerLoginExpirationEnabled: true,
@@ -1894,8 +1894,8 @@ func TestDefaultAccountManager_UpdateAccountSettings_PeerLoginExpiration(t *test
 	wg.Add(1)
 
 	// disabling PeerLoginExpirationEnabled should trigger cancel
-	
-	log.Printf("[DEBUG] TestDefaultAccountManager_UpdateAccountSettings_PeerLoginExpiration 2");
+
+	log.Printf("[DEBUG] TestDefaultAccountManager_UpdateAccountSettings_PeerLoginExpiration 2")
 	_, err = manager.UpdateAccountSettings(context.Background(), account.Id, userID, &Settings{
 		PeerLoginExpiration:        time.Hour,
 		PeerLoginExpirationEnabled: false,
@@ -1914,8 +1914,7 @@ func TestDefaultAccountManager_UpdateAccountSettings(t *testing.T) {
 	accountID, err := manager.GetAccountIDByUserID(context.Background(), userID, "")
 	require.NoError(t, err, "unable to create an account")
 
-	
-	log.Printf("[DEBUG] TestDefaultAccountManager_UpdateAccountSettings 1");
+	log.Printf("[DEBUG] TestDefaultAccountManager_UpdateAccountSettings 1")
 	updated, err := manager.UpdateAccountSettings(context.Background(), accountID, userID, &Settings{
 		PeerLoginExpiration:        time.Hour,
 		PeerLoginExpirationEnabled: false,
@@ -1930,16 +1929,14 @@ func TestDefaultAccountManager_UpdateAccountSettings(t *testing.T) {
 	assert.False(t, settings.PeerLoginExpirationEnabled)
 	assert.Equal(t, settings.PeerLoginExpiration, time.Hour)
 
-	
-	log.Printf("[DEBUG] TestDefaultAccountManager_UpdateAccountSettings 2");
+	log.Printf("[DEBUG] TestDefaultAccountManager_UpdateAccountSettings 2")
 	_, err = manager.UpdateAccountSettings(context.Background(), accountID, userID, &Settings{
 		PeerLoginExpiration:        time.Second,
 		PeerLoginExpirationEnabled: false,
 	})
 	require.Error(t, err, "expecting to fail when providing PeerLoginExpiration less than one hour")
 
-	
-	log.Printf("[DEBUG] TestDefaultAccountManager_UpdateAccountSettings 3");
+	log.Printf("[DEBUG] TestDefaultAccountManager_UpdateAccountSettings 3")
 	_, err = manager.UpdateAccountSettings(context.Background(), accountID, userID, &Settings{
 		PeerLoginExpiration:        time.Hour * 24 * 181,
 		PeerLoginExpirationEnabled: false,
@@ -2596,10 +2593,6 @@ func TestAccount_SetJWTGroups(t *testing.T) {
 			"user2": {Id: "user2", AccountID: "accountID"},
 		},
 	}
-
-	log.Printf("TEST: TestAccount_SetJWTGroups")
-	log.Printf("TEST: TestAccount_SetJWTGroups 2: %s", account.Peers["peer1"].LastLogin)
-	log.Printf("TEST: TestAccount_SetJWTGroups 3: %s", account.Users["user1"].LastLogin)
 
 	assert.NoError(t, manager.Store.SaveAccount(context.Background(), account), "unable to save account")
 

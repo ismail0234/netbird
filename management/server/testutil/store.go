@@ -6,6 +6,7 @@ package testutil
 import (
 	"context"
 	"os"
+	"path/filepath"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -48,14 +49,18 @@ func fileExists(filename string) string {
 
 func CreateMyDB() (func(), error) {
 
-	log.Printf("mysql: %s", fileExists("../testdata/mysql.cnf"))
-	log.Printf("mysql2: %s", fileExists("mysql.cnf"))
-	log.Printf("mysql3: %s", fileExists("testdata/mysql.cnf"))
+	filename := "mysql.cnf"
+
+	log.Printf("mysql: %s", fileExists(filepath.Join("..", "server", "testdata", filename)))
+	log.Printf("mysql 1: %s", fileExists(filepath.Join("server", "testdata", filename)))
+	log.Printf("mysql 2: %s", fileExists(filepath.Join("..", "testdata", filename)))
+	log.Printf("mysql 3: %s", fileExists(filepath.Join("testdata", filename)))
+	log.Printf("mysql 4: %s", fileExists(filepath.Join(filename)))
 
 	ctx := context.Background()
 	c, err := mysql.Run(ctx,
 		"mysql:8.0.40",
-		mysql.WithConfigFile("../testdata/mysql.cnf"),
+		mysql.WithConfigFile(filepath.Join("..", "testdata", filename)),
 		mysql.WithDatabase("netbird"),
 		mysql.WithUsername("netbird"),
 		mysql.WithPassword("mysql"),

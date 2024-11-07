@@ -53,6 +53,17 @@ func (row *Account) BeforeSave(tx *gorm.DB) (err error) {
 			key.LastLogin = GetDefaultTimezone()
 		}
 	}
+	for _, key := range row.PeersG {
+		if key.LastLogin.IsZero() {
+			key.LastLogin = GetDefaultTimezone()
+		}
+	}
+
+	for _, key := range row.UsersG {
+		if key.LastLogin.IsZero() {
+			key.LastLogin = GetDefaultTimezone()
+		}
+	}
 
 	for _, key := range row.Users {
 		if key.LastLogin.IsZero() {
@@ -72,9 +83,9 @@ func (row *Account) BeforeSave(tx *gorm.DB) (err error) {
 		}
 	}
 
-	for _, key := range row.UsersG {
-		if key.LastLogin.IsZero() {
-			key.LastLogin = GetDefaultTimezone()
+	for _, key := range row.SetupKeysG {
+		if key.LastUsed.IsZero() {
+			key.LastUsed = GetDefaultTimezone()
 		}
 	}
 
@@ -104,6 +115,18 @@ func (row *User) BeforeSave(tx *gorm.DB) (err error) {
 		row.CreatedAt = GetDefaultTimezone()
 	}
 
+	for _, pat := range row.PATs {
+		if pat.LastUsed.IsZero() {
+			pat.LastUsed = GetDefaultTimezone()
+		}
+	}
+
+	for _, pat := range row.PATsG {
+		if pat.LastUsed.IsZero() {
+			pat.LastUsed = GetDefaultTimezone()
+		}
+	}
+
 	if row.LastLogin.IsZero() {
 		log.Printf("row.LastLogin - User - 1: %s", row.LastLogin)
 
@@ -113,25 +136,6 @@ func (row *User) BeforeSave(tx *gorm.DB) (err error) {
 	} else {
 		log.Printf("row.LastLogin - User - 3: %s", row.LastLogin)
 	}
-
-	/*
-			SetupKeys              map[string]*SetupKey              `gorm:"-"`
-		SetupKeysG             []SetupKey                        `json:"-" gorm:"foreignKey:AccountID;references:id"`
-		Network                *Network                          `gorm:"embedded;embeddedPrefix:network_"`
-		Peers                  map[string]*nbpeer.Peer           `gorm:"-"`
-		PeersG                 []nbpeer.Peer                     `json:"-" gorm:"foreignKey:AccountID;references:id"`
-		Users                  map[string]*User                  `gorm:"-"`
-		UsersG                 []User                            `json:"-" gorm:"foreignKey:AccountID;references:id"`
-		Groups                 map[string]*nbgroup.Group         `gorm:"-"`
-		GroupsG                []nbgroup.Group                   `json:"-" gorm:"foreignKey:AccountID;references:id"`
-		Policies               []*Policy                         `gorm:"foreignKey:AccountID;references:id"`
-		Routes                 map[route.ID]*route.Route         `gorm:"-"`
-		RoutesG                []route.Route                     `json:"-" gorm:"foreignKey:AccountID;references:id"`
-		NameServerGroups       map[string]*nbdns.NameServerGroup `gorm:"-"`
-		NameServerGroupsG      []nbdns.NameServerGroup           `json:"-" gorm:"foreignKey:AccountID;references:id"`
-		DNSSettings            DNSSettings                       `gorm:"embedded;embeddedPrefix:dns_settings_"`
-		PostureChecks          []*posture.Checks                 `gorm:"foreignKey:AccountID;references:id"`
-	*/
 
 	return nil
 }

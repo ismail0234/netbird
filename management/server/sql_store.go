@@ -182,12 +182,15 @@ func (s *SqlStore) SaveAccount(ctx context.Context, account *Account) error {
 		}
 		log.Printf("SaveAccount - 7 => Peers: %d, users: %d, UsersG: %d", len(account.Peers), len(account.Users), len(account.UsersG))
 
-		for _, key := range account.SetupKeys {
-			log.Printf("SaveAccount - SetupKeys: %s", key.LastUsed)
+		for _, key := range account.Peers {
+			log.Printf("SaveAccount - Peers: %s", key.LastLogin)
+		}
+		for _, key := range account.PeersG {
+			log.Printf("SaveAccount - PeersG: %s", key.LastLogin)
 		}
 
-		for _, peer := range account.Peers {
-			log.Printf("SaveAccount - LastLogin: %s", peer.LastLogin)
+		for _, key := range account.UsersG {
+			log.Printf("SaveAccount - UsersG: %s", key.LastLogin)
 		}
 
 		for _, user := range account.Users {
@@ -199,8 +202,12 @@ func (s *SqlStore) SaveAccount(ctx context.Context, account *Account) error {
 			}
 		}
 
-		for _, user := range account.UsersG {
-			log.Printf("SaveAccount - UsersG: %s", user.LastLogin)
+		for _, key := range account.SetupKeys {
+			log.Printf("SaveAccount - SetupKeys: %s", key.LastUsed)
+		}
+
+		for _, key := range account.SetupKeysG {
+			log.Printf("SaveAccount - SetupKeysG: %s", key.LastUsed)
 		}
 
 		result = tx.
@@ -211,6 +218,16 @@ func (s *SqlStore) SaveAccount(ctx context.Context, account *Account) error {
 		log.Printf("SaveAccount - 8")
 
 		if result.Error != nil {
+			log.Printf("SaveAccount - Error: %s", result.Error)
+
+			sqlCode := tx.ToSQL(func(tx *gorm.DB) *gorm.DB {
+				return tx.
+					Session(&gorm.Session{FullSaveAssociations: true}).
+					Clauses(clause.OnConflict{UpdateAll: true}).
+					Create(account)
+			})
+
+			log.Printf("SaveAccount - SQL: %s", result.Error, sqlCode)
 			return result.Error
 		}
 

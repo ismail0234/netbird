@@ -1212,6 +1212,7 @@ func (s *SqlStore) GetSetupKeyBySecret(ctx context.Context, lockStrength Locking
 	startTime := time.Now()
 
 	log.Printf("GetSetupKeyBySecret => %s, GetStoreEngine: %s", GetKeyQueryCondition(s.GetStoreEngine()), s.GetStoreEngine())
+	log.Printf("GetSetupKeyBySecret NAME => %s", s.db.Name())
 
 	var setupKey SetupKey
 	result := s.db.WithContext(ctx).Clauses(clause.Locking{Strength: string(lockStrength)}).

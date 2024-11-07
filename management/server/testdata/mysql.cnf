@@ -28,7 +28,8 @@ datadir=/var/lib/mysql
 socket=/var/run/mysqld/mysqld.sock
 secure-file-priv=/var/lib/mysql-files
 user=mysql
-sql_mode = ""
+sql_mode=""
+innodb_flush_log_at_trx_commit=2
 
 pid-file=/var/run/mysqld/mysqld.pid
 [client]

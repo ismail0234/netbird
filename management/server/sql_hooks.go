@@ -19,7 +19,7 @@ type PeerStatusChildren struct {
 func GetDefaultTimezone() time.Time {
 	return time.Date(1, 1, 1, 1, 1, 1, 0, time.Local)
 }
-
+/*
 func (row *SetupKey) BeforeSave(tx *gorm.DB) (err error) {
 
 	if row.CreatedAt.IsZero() {
@@ -183,101 +183,4 @@ func (row *PeerStatusChildren) BeforeSave(tx *gorm.DB) (err error) {
 
 	return nil
 }
-
-func (row *UserInfo) BeforeCreate(tx *gorm.DB) (err error) {
-
-	log.Printf("row.LastLogin - BeforeCreate - UserInfo - 0: %s", row.LastLogin)
-
-	if row.LastLogin.IsZero() {
-		log.Printf("row.LastLogin - BeforeCreate - UserInfo - 1: %s", row.LastLogin)
-
-		row.LastLogin = GetDefaultTimezone()
-
-		log.Printf("row.LastLogin - BeforeCreate -UserInfo - 2: %s", row.LastLogin)
-	} else {
-		log.Printf("row.LastLogin - BeforeCreate -UserInfo - 3: %s", row.LastLogin)
-	}
-
-	return nil
-}
-func (row *PeerChildren) BeforeCreate(tx *gorm.DB) (err error) {
-
-	log.Printf("row.LastLogin - BeforeCreate - PeerChildren - 0: %s", row.LastLogin)
-
-	if row.LastLogin.IsZero() {
-		log.Printf("row.LastLogin - BeforeCreate - PeerChildren - 1: %s", row.LastLogin)
-
-		row.LastLogin = GetDefaultTimezone()
-
-		log.Printf("row.LastLogin - BeforeCreate -PeerChildren - 2: %s", row.LastLogin)
-	} else {
-		log.Printf("row.LastLogin - BeforeCreate -PeerChildren - 3: %s", row.LastLogin)
-	}
-
-	return nil
-}
-func (row *User) BeforeCreate(tx *gorm.DB) (err error) {
-
-	log.Printf("row.LastLogin - BeforeCreate - LastLogin - 0: %s", row.LastLogin)
-
-	if row.LastLogin.IsZero() {
-		log.Printf("row.LastLogin - BeforeCreate - LastLogin - 1: %s", row.LastLogin)
-
-		row.LastLogin = GetDefaultTimezone()
-
-		log.Printf("row.LastLogin - BeforeCreate - LastLogin - 2: %s", row.LastLogin)
-	} else {
-		log.Printf("row.LastLogin - BeforeCreate - LastLogin - 3: %s", row.LastLogin)
-	}
-
-	return nil
-}
-
-func (row *UserInfo) BeforeUpdate(tx *gorm.DB) (err error) {
-
-	log.Printf("row.LastLogin - BeforeUpdate - UserInfo - 0: %s", row.LastLogin)
-
-	if row.LastLogin.IsZero() {
-		log.Printf("row.LastLogin - BeforeUpdate - UserInfo - 1: %s", row.LastLogin)
-
-		row.LastLogin = GetDefaultTimezone()
-
-		log.Printf("row.LastLogin - BeforeUpdate -UserInfo - 2: %s", row.LastLogin)
-	} else {
-		log.Printf("row.LastLogin - BeforeUpdate -UserInfo - 3: %s", row.LastLogin)
-	}
-
-	return nil
-}
-func (row *PeerChildren) BeforeUpdate(tx *gorm.DB) (err error) {
-
-	log.Printf("row.LastLogin - BeforeUpdate - PeerChildren - 0: %s", row.LastLogin)
-
-	if row.LastLogin.IsZero() {
-		log.Printf("row.LastLogin - BeforeUpdate - PeerChildren - 1: %s", row.LastLogin)
-
-		row.LastLogin = GetDefaultTimezone()
-
-		log.Printf("row.LastLogin - BeforeUpdate -PeerChildren - 2: %s", row.LastLogin)
-	} else {
-		log.Printf("row.LastLogin - BeforeUpdate -PeerChildren - 3: %s", row.LastLogin)
-	}
-
-	return nil
-}
-func (row *User) BeforeUpdate(tx *gorm.DB) (err error) {
-
-	log.Printf("row.LastLogin - BeforeUpdate - LastLogin - 0: %s", row.LastLogin)
-
-	if row.LastLogin.IsZero() {
-		log.Printf("row.LastLogin - BeforeUpdate - LastLogin - 1: %s", row.LastLogin)
-
-		row.LastLogin = GetDefaultTimezone()
-
-		log.Printf("row.LastLogin - BeforeUpdate - LastLogin - 2: %s", row.LastLogin)
-	} else {
-		log.Printf("row.LastLogin - BeforeUpdate - LastLogin - 3: %s", row.LastLogin)
-	}
-
-	return nil
-}
+*/

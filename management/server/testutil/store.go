@@ -34,27 +34,24 @@ func CreatePGDB() (func(), error) {
 }
 
 func fileExists(filename string) bool {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return !info.IsDir()
+	_, err := os.Stat(filename)
+	return os.IsExist(err)
 }
 
 func CreateMyDB() (func(), error) {
 
-	mysqlConfigfPath := "../../management/server/testdata/mysql.cnf"
+	mysqlConfigPath := "../../management/server/testdata/mysql.cnf"
 
-	if fileExists(mysqlConfigfPath) {
-		log.Printf("mySQL Config fileExists: Yes")
+	if fileExists(mysqlConfigPath) {
+		log.Printf("MySQL Config fileExists: Yes")
 	} else {
-		log.Printf("mySQL Config fileExists: No")
+		log.Printf("MySQL Config fileExists: No")
 	}
 
 	ctx := context.Background()
 	c, err := mysql.Run(ctx,
 		"mysql:8.0.40",
-		mysql.WithConfigFile(mysqlConfigfPath),
+		mysql.WithConfigFile(mysqlConfigPath),
 		mysql.WithDatabase("netbird"),
 		mysql.WithUsername("netbird"),
 		mysql.WithPassword("mysql"),

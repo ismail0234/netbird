@@ -41,12 +41,32 @@ func fileExists(filename string) bool {
 func CreateMyDB() (func(), error) {
 
 	mysqlConfigPath := "../../management/server/testdata/mysql.cnf"
+	mysqlConfigPath2 := "../management/server/testdata/mysql.cnf"
+	mysqlConfigPath3 := "../server/testdata/mysql.cnf"
+	mysqlConfigPath4 := "../../server/testdata/mysql.cnf"
 	pwd, _ := os.Getwd()
 
 	if fileExists(mysqlConfigPath) {
 		log.Printf("MySQL Config fileExists: Yes")
 	} else {
 		log.Printf("MySQL Config fileExists: No => %s", pwd)
+
+		if fileExists(mysqlConfigPath2) {
+			log.Printf("MySQL Config fileExists2: Yes")
+		} else {
+			log.Printf("MySQL Config fileExists2: No => %s", pwd)
+			if fileExists(mysqlConfigPath3) {
+				log.Printf("MySQL Config fileExists3: Yes")
+			} else {
+				log.Printf("MySQL Config fileExists3: No => %s", pwd)
+				if fileExists(mysqlConfigPath4) {
+					log.Printf("MySQL Config fileExists4: Yes")
+				} else {
+					log.Printf("MySQL Config fileExists4: No => %s", pwd)
+					return nil, nil
+				}
+			}
+		}
 	}
 
 	ctx := context.Background()

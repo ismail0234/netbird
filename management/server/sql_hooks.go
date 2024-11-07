@@ -1,11 +1,11 @@
 package server
 
 import (
-	"log"
+	//"log"
 	"time"
 
 	nbpeer "github.com/netbirdio/netbird/management/server/peer"
-	"gorm.io/gorm"
+	// "gorm.io/gorm"
 )
 
 type PeerChildren struct {
@@ -19,6 +19,7 @@ type PeerStatusChildren struct {
 func GetDefaultTimezone() time.Time {
 	return time.Date(1, 1, 1, 1, 1, 1, 0, time.Local)
 }
+
 /*
 func (row *SetupKey) BeforeSave(tx *gorm.DB) (err error) {
 

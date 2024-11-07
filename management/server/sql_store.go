@@ -73,15 +73,11 @@ func NewSqlStore(ctx context.Context, db *gorm.DB, storeEngine StoreEngine, metr
 	sql.SetMaxOpenConns(conns)
 
 	if storeEngine == MysqlStoreEngine {
-		sql.SetConnMaxLifetime(120)
+		sql.SetConnMaxLifetime(time.Minute * 3)
 		sql.SetMaxIdleConns(conns)
 	}
 
 	log.Infof("Set max open db connections to %d", conns)
-
-	if storeEngine == MysqlStoreEngine {
-		sql.SetConnMaxLifetime(120)
-	}
 
 	if err := migrate(ctx, db); err != nil {
 		return nil, fmt.Errorf("migrate: %w", err)

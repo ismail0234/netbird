@@ -41,7 +41,7 @@ func fileExists(filename string) bool {
 func CreateMyDB() (func(), error) {
 
 	mysqlConfigPath := "../../management/server/testdata/mysql.cnf"
-	pwd, err := os.Getwd()
+	pwd, _ := os.Getwd()
 
 	if fileExists(mysqlConfigPath) {
 		log.Printf("MySQL Config fileExists: Yes")

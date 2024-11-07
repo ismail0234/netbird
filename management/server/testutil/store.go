@@ -54,7 +54,7 @@ func CreateMyDB() (func(), error) {
 	ctx := context.Background()
 	c, err := mysql.Run(ctx,
 		"mysql:8.0.40",
-		mysql.WithConfigFile(mysqlConfigfPath+"x1"),
+		mysql.WithConfigFile(mysqlConfigfPath),
 		mysql.WithDatabase("netbird"),
 		mysql.WithUsername("netbird"),
 		mysql.WithPassword("mysql"),

@@ -1192,6 +1192,16 @@ func (am *DefaultAccountManager) UpdateAccountSettings(ctx context.Context, acco
 }
 
 func (am *DefaultAccountManager) handleInactivityExpirationSettings(ctx context.Context, account *Account, oldSettings, newSettings *Settings, userID, accountID string) error {
+
+	if newSettings.PeerInactivityExpirationEnabled && oldSettings.PeerInactivityExpiration != newSettings.PeerInactivityExpiration {
+		oldSettings.PeerInactivityExpiration = newSettings.PeerInactivityExpiration
+
+		am.StoreEvent(ctx, userID, accountID, accountID, activity.AccountPeerInactivityExpirationDurationUpdated, nil)
+
+		log.Printf("handleInactivityExpirationSettings - 2 => %s, O1: %s, O2: %s", account.Id, oldSettings.PeerInactivityExpiration, newSettings.PeerInactivityExpiration)
+		am.checkAndSchedulePeerInactivityExpiration(ctx, account)
+	}
+
 	if oldSettings.PeerInactivityExpirationEnabled != newSettings.PeerInactivityExpirationEnabled {
 		event := activity.AccountPeerInactivityExpirationEnabled
 		if !newSettings.PeerInactivityExpirationEnabled {
@@ -1202,14 +1212,6 @@ func (am *DefaultAccountManager) handleInactivityExpirationSettings(ctx context.
 			am.checkAndSchedulePeerInactivityExpiration(ctx, account)
 		}
 		am.StoreEvent(ctx, userID, accountID, accountID, event, nil)
-	}
-
-	if oldSettings.PeerInactivityExpiration != newSettings.PeerInactivityExpiration {
-		oldSettings.PeerInactivityExpiration = newSettings.PeerInactivityExpiration
-		am.StoreEvent(ctx, userID, accountID, accountID, activity.AccountPeerInactivityExpirationDurationUpdated, nil)
-
-		log.Printf("handleInactivityExpirationSettings - 2 => %s, O1: %s, O2: %s", account.Id, oldSettings.PeerInactivityExpiration, newSettings.PeerInactivityExpiration)
-		am.checkAndSchedulePeerInactivityExpiration(ctx, account)
 	}
 
 	return nil

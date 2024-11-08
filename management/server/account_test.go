@@ -1814,7 +1814,8 @@ func TestDefaultAccountManager_MarkPeerConnected_PeerLoginExpiration(t *testing.
 		for _, peer := range accountX.GetPeers() {
 			log.Printf("[DEBUG] ACCOUNT PEER => %s, userID => %s, peer.InactivityExpirationEnabled: %t", peer.ID, peer.UserID, peer.InactivityExpirationEnabled)
 			peer.InactivityExpirationEnabled = false
-		}*/
+		}
+	*/
 
 	log.Printf("[DEBUG] TestDefaultAccountManager_MarkPeerConnected_PeerLoginExpiration => %s, userID => %s", accountID, userID)
 	_, err = manager.UpdateAccountSettings(context.Background(), accountID, userID, &Settings{
@@ -1825,6 +1826,8 @@ func TestDefaultAccountManager_MarkPeerConnected_PeerLoginExpiration(t *testing.
 		PeerInactivityExpirationEnabled: false,
 	})
 	require.NoError(t, err, "expecting to update account settings successfully but got error")
+
+	log.Printf("[DEBUG] TestDefaultAccountManager_MarkPeerConnected_PeerLoginExpiration 2 => %s, userID => %s", accountID, userID)
 
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
@@ -1842,6 +1845,8 @@ func TestDefaultAccountManager_MarkPeerConnected_PeerLoginExpiration(t *testing.
 
 	account, err := manager.Store.GetAccount(context.Background(), accountID)
 	require.NoError(t, err, "unable to get the account")
+
+	log.Printf("[DEBUG] TestDefaultAccountManager_MarkPeerConnected_PeerLoginExpiration 3 => %s, userID => %s", accountID, userID)
 
 	// when we mark peer as connected, the peer login expiration routine should trigger
 	err = manager.MarkPeerConnected(context.Background(), key.PublicKey().String(), true, nil, account)

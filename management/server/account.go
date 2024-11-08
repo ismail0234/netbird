@@ -16,7 +16,7 @@ import (
 	"strings"
 	"sync"
 	"time"
- 
+
 	"github.com/eko/gocache/v3/cache"
 	cacheStore "github.com/eko/gocache/v3/store"
 	"github.com/hashicorp/go-multierror"
@@ -1123,6 +1123,7 @@ func (am *DefaultAccountManager) GetIdpManager() idp.Manager {
 // User that performs the update has to belong to the account.
 // Returns an updated Account
 func (am *DefaultAccountManager) UpdateAccountSettings(ctx context.Context, accountID, userID string, newSettings *Settings) (*Account, error) {
+
 	halfYearLimit := 180 * 24 * time.Hour
 	if newSettings.PeerLoginExpiration > halfYearLimit {
 		return nil, status.Errorf(status.InvalidArgument, "peer login expiration can't be larger than 180 days")
@@ -1139,6 +1140,8 @@ func (am *DefaultAccountManager) UpdateAccountSettings(ctx context.Context, acco
 	if err != nil {
 		return nil, err
 	}
+
+	log.Printf("handleInactivityExpirationSettings - FIRST => %s, O1: %s, O2: %s", account.Id, account.Settings.PeerInactivityExpiration, newSettings.PeerInactivityExpiration)
 
 	user, err := account.FindUser(userID)
 	if err != nil {

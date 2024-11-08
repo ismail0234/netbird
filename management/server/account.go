@@ -1141,8 +1141,6 @@ func (am *DefaultAccountManager) UpdateAccountSettings(ctx context.Context, acco
 		return nil, err
 	}
 
-	log.Printf("handleInactivityExpirationSettings - FIRST => %s, O1: %s, O2: %s", account.Id, account.Settings.PeerInactivityExpiration, newSettings.PeerInactivityExpiration)
-
 	user, err := account.FindUser(userID)
 	if err != nil {
 		return nil, err
@@ -1173,8 +1171,6 @@ func (am *DefaultAccountManager) UpdateAccountSettings(ctx context.Context, acco
 		am.StoreEvent(ctx, userID, accountID, accountID, activity.AccountPeerLoginExpirationDurationUpdated, nil)
 		am.checkAndSchedulePeerLoginExpiration(ctx, account)
 	}
-
-	log.Printf("handleInactivityExpirationSettings - MAIN => %s, O1: %s, O2: %s", account.Id, oldSettings.PeerInactivityExpiration, newSettings.PeerInactivityExpiration)
 
 	err = am.handleInactivityExpirationSettings(ctx, account, oldSettings, newSettings, userID, accountID)
 	if err != nil {
@@ -1284,8 +1280,6 @@ func (am *DefaultAccountManager) peerInactivityExpirationJob(ctx context.Context
 func (am *DefaultAccountManager) checkAndSchedulePeerInactivityExpiration(ctx context.Context, account *Account) {
 	am.peerInactivityExpiry.Cancel(ctx, []string{account.Id})
 	if nextRun, ok := account.GetNextInactivePeerExpiration(); ok {
-		log.Printf("SCHEDULE ==> %s, nextRun: %s, Now: %s", account.Id, nextRun, time.Now())
-		nextRun = time.Duration(5 * float64(time.Second))
 		go am.peerInactivityExpiry.Schedule(ctx, nextRun, account.Id, am.peerInactivityExpirationJob(ctx, account.Id))
 	}
 }

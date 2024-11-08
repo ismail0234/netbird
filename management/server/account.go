@@ -1171,6 +1171,8 @@ func (am *DefaultAccountManager) UpdateAccountSettings(ctx context.Context, acco
 		am.checkAndSchedulePeerLoginExpiration(ctx, account)
 	}
 
+	log.Printf("handleInactivityExpirationSettings - MAIN => %s, O1: %s, O2: %s", account.Id, oldSettings.PeerInactivityExpiration, newSettings.PeerInactivityExpiration)
+
 	err = am.handleInactivityExpirationSettings(ctx, account, oldSettings, newSettings, userID, accountID)
 	if err != nil {
 		return nil, err
@@ -1193,6 +1195,7 @@ func (am *DefaultAccountManager) handleInactivityExpirationSettings(ctx context.
 			event = activity.AccountPeerInactivityExpirationDisabled
 			am.peerInactivityExpiry.Cancel(ctx, []string{accountID})
 		} else {
+			log.Printf("handleInactivityExpirationSettings - 1 => %s, O1: %s, O2: %s", account.Id, oldSettings.PeerInactivityExpiration, newSettings.PeerInactivityExpiration)
 			am.checkAndSchedulePeerInactivityExpiration(ctx, account)
 		}
 		am.StoreEvent(ctx, userID, accountID, accountID, event, nil)
@@ -1200,6 +1203,8 @@ func (am *DefaultAccountManager) handleInactivityExpirationSettings(ctx context.
 
 	if oldSettings.PeerInactivityExpiration != newSettings.PeerInactivityExpiration {
 		am.StoreEvent(ctx, userID, accountID, accountID, activity.AccountPeerInactivityExpirationDurationUpdated, nil)
+
+		log.Printf("handleInactivityExpirationSettings - 2 => %s, O1: %s, O2: %s", account.Id, oldSettings.PeerInactivityExpiration, newSettings.PeerInactivityExpiration)
 		am.checkAndSchedulePeerInactivityExpiration(ctx, account)
 	}
 
@@ -1274,7 +1279,7 @@ func (am *DefaultAccountManager) peerInactivityExpirationJob(ctx context.Context
 func (am *DefaultAccountManager) checkAndSchedulePeerInactivityExpiration(ctx context.Context, account *Account) {
 	am.peerInactivityExpiry.Cancel(ctx, []string{account.Id})
 	if nextRun, ok := account.GetNextInactivePeerExpiration(); ok {
-		nextRun = time.Duration(2000 * float64(time.Second))
+		nextRun = time.Duration(5 * float64(time.Second))
 		log.Printf("SCHEDULE ==> %s, nextRun: %s, Now: %s", account.Id, nextRun, time.Now())
 		go am.peerInactivityExpiry.Schedule(ctx, nextRun, account.Id, am.peerInactivityExpirationJob(ctx, account.Id))
 	}

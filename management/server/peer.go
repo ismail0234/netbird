@@ -456,7 +456,6 @@ func (am *DefaultAccountManager) AddPeer(ctx context.Context, setupKey, userID s
 		} else {
 			// Validate the setup key
 
-			log.Printf("GetSetupKeyBySecret REAL => %s, REAL2: %s", transaction.GetStoreEngine(), am.Store.GetStoreEngine())
 			sk, err := transaction.GetSetupKeyBySecret(ctx, LockingStrengthUpdate, encodedHashedKey)
 			if err != nil {
 				return fmt.Errorf("failed to get setup key: %w", err)

@@ -1808,7 +1808,6 @@ func TestDefaultAccountManager_MarkPeerConnected_PeerLoginExpiration(t *testing.
 		LoginExpirationEnabled: true,
 	})
 	require.NoError(t, err, "unable to add peer")
-
 	/*
 		accountX, _ := manager.Store.GetAccount(context.Background(), accountID)
 		for _, peer := range accountX.GetPeers() {
@@ -1816,6 +1815,11 @@ func TestDefaultAccountManager_MarkPeerConnected_PeerLoginExpiration(t *testing.
 			peer.InactivityExpirationEnabled = false
 		}
 	*/
+
+	oldAccount, err := manager.Store.GetAccount(context.Background(), accountID)
+	require.NoError(t, err, "unable to get the account")
+
+	oldAccount.Settings.PeerInactivityExpiration = time.Hour
 
 	log.Printf("[DEBUG] TestDefaultAccountManager_MarkPeerConnected_PeerLoginExpiration => %s, userID => %s", accountID, userID)
 	_, err = manager.UpdateAccountSettings(context.Background(), accountID, userID, &Settings{

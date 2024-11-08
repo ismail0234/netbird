@@ -1812,7 +1812,7 @@ func TestDefaultAccountManager_MarkPeerConnected_PeerLoginExpiration(t *testing.
 
 	accountX, _ := manager.Store.GetAccount(context.Background(), accountID)
 	for _, peer := range accountX.GetPeers() {
-		log.Printf("[DEBUG] ACCOUNT PEER => %s, userID => %s, peer.InactivityExpirationEnabled: %d", peer.ID, peer.UserID, peer.InactivityExpirationEnabled)
+		log.Printf("[DEBUG] ACCOUNT PEER => %s, userID => %s, peer.InactivityExpirationEnabled: %t", peer.ID, peer.UserID, peer.InactivityExpirationEnabled)
 		peer.InactivityExpirationEnabled = false
 	}
 

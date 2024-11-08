@@ -83,8 +83,7 @@ func NewSqlStore(ctx context.Context, db *gorm.DB, storeEngine StoreEngine, metr
 
 	log.WithContext(ctx).Infof("Set max open db connections to %d", conns)
 
-	if (storeEngine == "")
-	{
+	if storeEngine == "" {
 		log.WithContext(ctx).Infof("EMPTY storeEngine")
 		return nil, nil
 	}
@@ -1118,8 +1117,7 @@ func NewPostgresqlStore(ctx context.Context, dsn string, metrics telemetry.AppMe
 
 // NewMysqlStore creates a new MySQL store.
 func NewMysqlStore(ctx context.Context, dsn string, metrics telemetry.AppMetrics) (*SqlStore, error) {
-	
-	
+
 	db, err := gorm.Open(mysql.Open(dsn+"?charset=utf8&parseTime=True&interpolateParams=True&multiStatements=True&tls=preferred&allowFallbackToPlaintext=true"), getGormMysqlConfig())
 	if err != nil {
 		return nil, err
@@ -1137,11 +1135,11 @@ func getGormConfig() *gorm.Config {
 }
 
 func getGormMysqlConfig() *gorm.Config {
-	
+
 	return &gorm.Config{
-		Logger:          logger.Default.LogMode(logger.Info),
-		CreateBatchSize: 400,
-		PrepareStmt:     true,
+		Logger:                 logger.Default.LogMode(logger.Info),
+		CreateBatchSize:        400,
+		PrepareStmt:            true,
 		SkipDefaultTransaction: true,
 	}
 }

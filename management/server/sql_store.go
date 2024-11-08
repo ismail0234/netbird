@@ -1123,9 +1123,6 @@ func NewMysqlStore(ctx context.Context, dsn string, metrics telemetry.AppMetrics
 		return nil, err
 	}
 
-	db.Set("gorm:table_options", "ENGINE=InnoDB")
-	// db.Set("gorm:table_options", "collation_connection=utf8_general_ci")
-
 	return NewSqlStore(ctx, db, MysqlStoreEngine, metrics)
 }
 
@@ -1140,11 +1137,10 @@ func getGormConfig() *gorm.Config {
 func getGormMysqlConfig() *gorm.Config {
 
 	return &gorm.Config{
-		Logger:                                   logger.Default.LogMode(logger.Info),
-		CreateBatchSize:                          400,
-		PrepareStmt:                              true,
-		SkipDefaultTransaction:                   true,
-		DisableForeignKeyConstraintWhenMigrating: false,
+		Logger:                 logger.Default.LogMode(logger.Info),
+		CreateBatchSize:        400,
+		PrepareStmt:            true,
+		SkipDefaultTransaction: true,
 	}
 }
 

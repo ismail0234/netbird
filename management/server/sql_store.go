@@ -1123,6 +1123,9 @@ func NewMysqlStore(ctx context.Context, dsn string, metrics telemetry.AppMetrics
 		return nil, err
 	}
 
+	db.Set("gorm:table_options", "ENGINE=InnoDB")
+	// db.Set("gorm:table_options", "collation_connection=utf8_general_ci")
+
 	return NewSqlStore(ctx, db, MysqlStoreEngine, metrics)
 }
 

@@ -2,7 +2,6 @@ package http
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"time"
 
@@ -100,8 +99,6 @@ func (h *AccountsHandler) UpdateAccount(w http.ResponseWriter, r *http.Request) 
 	if req.Settings.JwtAllowGroups != nil {
 		settings.JWTAllowGroups = *req.Settings.JwtAllowGroups
 	}
-
-	log.Printf("UpdateAccount - MAIN => %s, PeerInactivityExpiration: %s", accountID, settings.PeerInactivityExpiration)
 
 	updatedAccount, err := h.accountManager.UpdateAccountSettings(r.Context(), accountID, userID, settings)
 	if err != nil {

@@ -30,7 +30,10 @@ func CreatePGDB() (func(), error) {
 
 	talksConn, err := c.ConnectionString(ctx)
 
-	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_POSTGRES_DSN")
+	log.Printf("ConnectionString: %s", talksConn)
+
+	return nil, nil
+	// return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_POSTGRES_DSN")
 }
 
 func CreateMyDB() (func(), error) {

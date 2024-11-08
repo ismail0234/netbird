@@ -27,12 +27,9 @@ func CreatePGDB() (func(), error) {
 		return nil, err
 	}
 
-	talksConn, _ := c.ConnectionString(ctx)
+	talksConn, err := c.ConnectionString(ctx)
 
-	log.Printf("ConnectionString: %s", talksConn)
-
-	return nil, nil
-	// return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_POSTGRES_DSN")
+	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_POSTGRES_DSN")
 }
 
 func CreateMyDB() (func(), error) {
@@ -54,13 +51,9 @@ func CreateMyDB() (func(), error) {
 		return nil, err
 	}
 
-	talksConn, _ := c.ConnectionString(ctx)
+	talksConn, err := c.ConnectionString(ctx)
 
-	log.Printf("ConnectionString: %s", talksConn)
-
-	return nil, nil
-
-	//return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_MYSQL_DSN")
+	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_MYSQL_DSN")
 }
 
 func GetContextDB(ctx context.Context, c testcontainers.Container, talksConn string, err error, dsn string) (func(), error) {

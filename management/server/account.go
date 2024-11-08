@@ -1195,12 +1195,14 @@ func (am *DefaultAccountManager) handleInactivityExpirationSettings(ctx context.
 			event = activity.AccountPeerInactivityExpirationDisabled
 			am.peerInactivityExpiry.Cancel(ctx, []string{accountID})
 		} else {
+			log.Printf("handleInactivityExpirationSettings Triggered 1: OldValue: %s, NewValue: %s", oldSettings.PeerInactivityExpiration, newSettings.PeerInactivityExpiration)
 			am.checkAndSchedulePeerInactivityExpiration(ctx, account)
 		}
 		am.StoreEvent(ctx, userID, accountID, accountID, event, nil)
 	}
 
 	if oldSettings.PeerInactivityExpiration != newSettings.PeerInactivityExpiration {
+		log.Printf("handleInactivityExpirationSettings Triggered 2: OldValue: %s, NewValue: %s", oldSettings.PeerInactivityExpiration, newSettings.PeerInactivityExpiration)
 		am.StoreEvent(ctx, userID, accountID, accountID, activity.AccountPeerInactivityExpirationDurationUpdated, nil)
 		am.checkAndSchedulePeerInactivityExpiration(ctx, account)
 	}

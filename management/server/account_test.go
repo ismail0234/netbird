@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
@@ -1757,6 +1758,8 @@ func TestDefaultAccountManager_UpdatePeer_PeerLoginExpiration(t *testing.T) {
 
 	err = manager.MarkPeerConnected(context.Background(), key.PublicKey().String(), true, nil, account)
 	require.NoError(t, err, "unable to mark peer connected")
+
+	log.Printf("TestDefaultAccountManager_UpdatePeer_PeerLoginExpiration TRIGGERED!")
 
 	account, err = manager.UpdateAccountSettings(context.Background(), accountID, userID, &Settings{
 		PeerLoginExpiration:             time.Hour,

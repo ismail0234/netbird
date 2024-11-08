@@ -1814,7 +1814,6 @@ func TestDefaultAccountManager_MarkPeerConnected_PeerLoginExpiration(t *testing.
 		PeerLoginExpiration:        time.Hour,
 		PeerLoginExpirationEnabled: true,
 
-		PeerInactivityExpiration:        time.Hour,
 		PeerInactivityExpirationEnabled: false,
 	})
 	require.NoError(t, err, "expecting to update account settings successfully but got error")

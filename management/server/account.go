@@ -1193,25 +1193,24 @@ func (am *DefaultAccountManager) UpdateAccountSettings(ctx context.Context, acco
 
 func (am *DefaultAccountManager) handleInactivityExpirationSettings(ctx context.Context, account *Account, oldSettings, newSettings *Settings, userID, accountID string) error {
 
-	if newSettings.PeerInactivityExpirationEnabled && oldSettings.PeerInactivityExpiration != newSettings.PeerInactivityExpiration {
-		oldSettings.PeerInactivityExpiration = newSettings.PeerInactivityExpiration
+	if newSettings.PeerInactivityExpirationEnabled {
+		if oldSettings.PeerInactivityExpiration != newSettings.PeerInactivityExpiration {
+			oldSettings.PeerInactivityExpiration = newSettings.PeerInactivityExpiration
 
-		am.StoreEvent(ctx, userID, accountID, accountID, activity.AccountPeerInactivityExpirationDurationUpdated, nil)
-
-		log.Printf("handleInactivityExpirationSettings - 2 => %s, O1: %s, O2: %s", account.Id, oldSettings.PeerInactivityExpiration, newSettings.PeerInactivityExpiration)
-		am.checkAndSchedulePeerInactivityExpiration(ctx, account)
-	}
-
-	if oldSettings.PeerInactivityExpirationEnabled != newSettings.PeerInactivityExpirationEnabled {
-		event := activity.AccountPeerInactivityExpirationEnabled
-		if !newSettings.PeerInactivityExpirationEnabled {
-			event = activity.AccountPeerInactivityExpirationDisabled
-			am.peerInactivityExpiry.Cancel(ctx, []string{accountID})
-		} else {
-			log.Printf("handleInactivityExpirationSettings - 1 => %s, O1: %s, O2: %s", account.Id, oldSettings.PeerInactivityExpiration, newSettings.PeerInactivityExpiration)
+			am.StoreEvent(ctx, userID, accountID, accountID, activity.AccountPeerInactivityExpirationDurationUpdated, nil)
 			am.checkAndSchedulePeerInactivityExpiration(ctx, account)
 		}
-		am.StoreEvent(ctx, userID, accountID, accountID, event, nil)
+	} else {
+		if oldSettings.PeerInactivityExpirationEnabled != newSettings.PeerInactivityExpirationEnabled {
+			event := activity.AccountPeerInactivityExpirationEnabled
+			if !newSettings.PeerInactivityExpirationEnabled {
+				event = activity.AccountPeerInactivityExpirationDisabled
+				am.peerInactivityExpiry.Cancel(ctx, []string{accountID})
+			} else {
+				am.checkAndSchedulePeerInactivityExpiration(ctx, account)
+			}
+			am.StoreEvent(ctx, userID, accountID, accountID, event, nil)
+		}
 	}
 
 	return nil

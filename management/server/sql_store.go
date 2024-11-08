@@ -83,11 +83,17 @@ func NewSqlStore(ctx context.Context, db *gorm.DB, storeEngine StoreEngine, metr
 
 	log.WithContext(ctx).Infof("Set max open db connections to %d", conns)
 
+	if (storeEngine == "")
+	{
+		log.WithContext(ctx).Infof("EMPTY storeEngine")
+		return nil, nil
+	}
+
 	if storeEngine == MysqlStoreEngine {
 		sql.SetConnMaxLifetime(time.Second * 120)
 		sql.SetConnMaxIdleTime(time.Second * 120)
-		sql.SetMaxIdleConns(10)
-		sql.SetMaxOpenConns(10)
+		sql.SetMaxIdleConns(100)
+		sql.SetMaxOpenConns(100)
 	}
 
 	log.Infof("Set max open db connections to %d", conns)
@@ -1114,7 +1120,7 @@ func NewPostgresqlStore(ctx context.Context, dsn string, metrics telemetry.AppMe
 func NewMysqlStore(ctx context.Context, dsn string, metrics telemetry.AppMetrics) (*SqlStore, error) {
 	
 	
-	db, err := gorm.Open(mysql.Open(dsn+"?charset=utf8&parseTime=True&interpolateParams=True&multiStatements=True&tls=skip-verify"), getGormMysqlConfig())
+	db, err := gorm.Open(mysql.Open(dsn+"?charset=utf8&parseTime=True&interpolateParams=True&multiStatements=True&tls=preferred&allowFallbackToPlaintext=true"), getGormMysqlConfig())
 	if err != nil {
 		return nil, err
 	}
@@ -1133,7 +1139,7 @@ func getGormConfig() *gorm.Config {
 func getGormMysqlConfig() *gorm.Config {
 	
 	return &gorm.Config{
-		Logger:          logger.Default.LogMode(logger.Silent),
+		Logger:          logger.Default.LogMode(logger.Info),
 		CreateBatchSize: 400,
 		PrepareStmt:     true,
 		SkipDefaultTransaction: true,

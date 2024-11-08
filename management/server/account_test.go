@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
@@ -983,6 +982,110 @@ func TestAccountManager_DeleteAccount(t *testing.T) {
 	}
 }
 
+func BenchmarkTest_GetAccountWithclaims(b *testing.B) {
+	claims := jwtclaims.AuthorizationClaims{
+		Domain:         "example.com",
+		UserId:         "pvt-domain-user",
+		DomainCategory: PrivateCategory,
+	}
+
+	publicClaims := jwtclaims.AuthorizationClaims{
+		Domain:         "test.com",
+		UserId:         "public-domain-user",
+		DomainCategory: PublicCategory,
+	}
+
+	am, err := createManager(b)
+	if err != nil {
+		b.Fatal(err)
+		return
+	}
+	id, err := am.getAccountIDWithAuthorizationClaims(context.Background(), claims)
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	pid, err := am.getAccountIDWithAuthorizationClaims(context.Background(), publicClaims)
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	users := genUsers("priv", 100)
+
+	acc, err := am.Store.GetAccount(context.Background(), id)
+	if err != nil {
+		b.Fatal(err)
+	}
+	acc.Users = users
+
+	err = am.Store.SaveAccount(context.Background(), acc)
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	userP := genUsers("pub", 100)
+
+	pacc, err := am.Store.GetAccount(context.Background(), pid)
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	pacc.Users = userP
+
+	err = am.Store.SaveAccount(context.Background(), pacc)
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	b.Run("public without account ID", func(b *testing.B) {
+		//b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_, err := am.getAccountIDWithAuthorizationClaims(context.Background(), publicClaims)
+			if err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
+
+	b.Run("private without account ID", func(b *testing.B) {
+		//b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_, err := am.getAccountIDWithAuthorizationClaims(context.Background(), claims)
+			if err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
+
+	b.Run("private with account ID", func(b *testing.B) {
+		claims.AccountId = id
+		//b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_, err := am.getAccountIDWithAuthorizationClaims(context.Background(), claims)
+			if err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
+
+}
+
+func genUsers(p string, n int) map[string]*User {
+	users := map[string]*User{}
+	now := time.Now()
+	for i := 0; i < n; i++ {
+		users[fmt.Sprintf("%s-%d", p, i)] = &User{
+			Id:         fmt.Sprintf("%s-%d", p, i),
+			Role:       UserRoleAdmin,
+			LastLogin:  now,
+			CreatedAt:  now,
+			Issued:     "api",
+			AutoGroups: []string{"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"},
+		}
+	}
+	return users
+}
+
 func TestAccountManager_AddPeer(t *testing.T) {
 	manager, err := createManager(t)
 	if err != nil {
@@ -1759,8 +1862,6 @@ func TestDefaultAccountManager_UpdatePeer_PeerLoginExpiration(t *testing.T) {
 	err = manager.MarkPeerConnected(context.Background(), key.PublicKey().String(), true, nil, account)
 	require.NoError(t, err, "unable to mark peer connected")
 
-	log.Printf("TestDefaultAccountManager_UpdatePeer_PeerLoginExpiration TRIGGERED!")
-
 	account, err = manager.UpdateAccountSettings(context.Background(), accountID, userID, &Settings{
 		PeerLoginExpiration:             time.Hour,
 		PeerLoginExpirationEnabled:      true,
@@ -1810,7 +1911,6 @@ func TestDefaultAccountManager_MarkPeerConnected_PeerLoginExpiration(t *testing.
 		LoginExpirationEnabled: true,
 	})
 	require.NoError(t, err, "unable to add peer")
-
 	_, err = manager.UpdateAccountSettings(context.Background(), accountID, userID, &Settings{
 		PeerLoginExpiration:             time.Hour,
 		PeerLoginExpirationEnabled:      true,
@@ -1881,7 +1981,6 @@ func TestDefaultAccountManager_UpdateAccountSettings_PeerLoginExpiration(t *test
 		},
 	}
 	// enabling PeerLoginExpirationEnabled should trigger the expiration job
-
 	account, err = manager.UpdateAccountSettings(context.Background(), account.Id, userID, &Settings{
 		PeerLoginExpiration:             time.Hour,
 		PeerLoginExpirationEnabled:      true,
@@ -1896,7 +1995,6 @@ func TestDefaultAccountManager_UpdateAccountSettings_PeerLoginExpiration(t *test
 	wg.Add(1)
 
 	// disabling PeerLoginExpirationEnabled should trigger cancel
-
 	_, err = manager.UpdateAccountSettings(context.Background(), account.Id, userID, &Settings{
 		PeerLoginExpiration:             time.Hour,
 		PeerLoginExpirationEnabled:      false,
@@ -1917,8 +2015,9 @@ func TestDefaultAccountManager_UpdateAccountSettings(t *testing.T) {
 	require.NoError(t, err, "unable to create an account")
 
 	updated, err := manager.UpdateAccountSettings(context.Background(), accountID, userID, &Settings{
-		PeerLoginExpiration:        time.Hour,
-		PeerLoginExpirationEnabled: false,
+		PeerLoginExpiration:             time.Hour,
+		PeerLoginExpirationEnabled:      false,
+		PeerInactivityExpirationEnabled: false,
 	})
 	require.NoError(t, err, "expecting to update account settings successfully but got error")
 	assert.False(t, updated.Settings.PeerLoginExpirationEnabled)

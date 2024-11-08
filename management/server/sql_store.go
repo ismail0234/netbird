@@ -546,10 +546,6 @@ func GetKeyQueryCondition(s *SqlStore) string {
 		return mysqlKeyQueryCondition
 	}
 
-	if s.storeEngine == "" && s.db.Name() == "mysql" {
-		return mysqlKeyQueryCondition
-	}
-
 	return keyQueryCondition
 }
 
@@ -1354,7 +1350,8 @@ func (s *SqlStore) ExecuteInTransaction(ctx context.Context, operation func(stor
 
 func (s *SqlStore) withTx(tx *gorm.DB) Store {
 	return &SqlStore{
-		db: tx,
+		db:          tx,
+		storeEngine: s.storeEngine,
 	}
 }
 

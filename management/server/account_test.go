@@ -1803,23 +1803,26 @@ func TestDefaultAccountManager_MarkPeerConnected_PeerLoginExpiration(t *testing.
 	key, err := wgtypes.GenerateKey()
 	require.NoError(t, err, "unable to generate WireGuard key")
 	_, _, _, err = manager.AddPeer(context.Background(), "", userID, &nbpeer.Peer{
-		Key:                         key.PublicKey().String(),
-		Meta:                        nbpeer.PeerSystemMeta{Hostname: "test-peer"},
-		LoginExpirationEnabled:      true,
-		InactivityExpirationEnabled: false,
+		Key:                    key.PublicKey().String(),
+		Meta:                   nbpeer.PeerSystemMeta{Hostname: "test-peer"},
+		LoginExpirationEnabled: true,
 	})
 	require.NoError(t, err, "unable to add peer")
 
-	accountX, _ := manager.Store.GetAccount(context.Background(), accountID)
-	for _, peer := range accountX.GetPeers() {
-		log.Printf("[DEBUG] ACCOUNT PEER => %s, userID => %s, peer.InactivityExpirationEnabled: %t", peer.ID, peer.UserID, peer.InactivityExpirationEnabled)
-		peer.InactivityExpirationEnabled = false
-	}
+	/*
+		accountX, _ := manager.Store.GetAccount(context.Background(), accountID)
+		for _, peer := range accountX.GetPeers() {
+			log.Printf("[DEBUG] ACCOUNT PEER => %s, userID => %s, peer.InactivityExpirationEnabled: %t", peer.ID, peer.UserID, peer.InactivityExpirationEnabled)
+			peer.InactivityExpirationEnabled = false
+		}*/
 
 	log.Printf("[DEBUG] TestDefaultAccountManager_MarkPeerConnected_PeerLoginExpiration => %s, userID => %s", accountID, userID)
 	_, err = manager.UpdateAccountSettings(context.Background(), accountID, userID, &Settings{
 		PeerLoginExpiration:        time.Hour,
 		PeerLoginExpirationEnabled: true,
+
+		PeerInactivityExpiration:        time.Hour,
+		PeerInactivityExpirationEnabled: false,
 	})
 	require.NoError(t, err, "expecting to update account settings successfully but got error")
 

@@ -1274,7 +1274,7 @@ func (am *DefaultAccountManager) peerInactivityExpirationJob(ctx context.Context
 func (am *DefaultAccountManager) checkAndSchedulePeerInactivityExpiration(ctx context.Context, account *Account) {
 	am.peerInactivityExpiry.Cancel(ctx, []string{account.Id})
 	if nextRun, ok := account.GetNextInactivePeerExpiration(); ok {
-		nextRun = time.Duration(10 * float64(time.Second))
+		nextRun = time.Duration(2000 * float64(time.Second))
 		log.Printf("SCHEDULE ==> %s, nextRun: %s, Now: %s", account.Id, nextRun, time.Now())
 		go am.peerInactivityExpiry.Schedule(ctx, nextRun, account.Id, am.peerInactivityExpirationJob(ctx, account.Id))
 	}

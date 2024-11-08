@@ -16,8 +16,7 @@ import (
 )
 
 func CreatePGDB() (func(), error) {
-
-	log.Printf("[DEBUG] CreatePGDB")
+	log.Printf("CreatePGDB: ")
 
 	ctx := context.Background()
 	c, err := postgres.Run(ctx, "postgres:16-alpine", testcontainers.WithWaitStrategy(
@@ -28,7 +27,7 @@ func CreatePGDB() (func(), error) {
 		return nil, err
 	}
 
-	talksConn, err := c.ConnectionString(ctx)
+	talksConn, _ := c.ConnectionString(ctx)
 
 	log.Printf("ConnectionString: %s", talksConn)
 
@@ -37,6 +36,8 @@ func CreatePGDB() (func(), error) {
 }
 
 func CreateMyDB() (func(), error) {
+
+	log.Printf("CreateMyDB: ")
 
 	mysqlConfigPath := "../../management/server/testdata/mysql.cnf"
 
@@ -53,9 +54,13 @@ func CreateMyDB() (func(), error) {
 		return nil, err
 	}
 
-	talksConn, err := c.ConnectionString(ctx)
+	talksConn, _ := c.ConnectionString(ctx)
 
-	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_MYSQL_DSN")
+	log.Printf("ConnectionString: %s", talksConn)
+
+	return nil, nil
+
+	//return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_MYSQL_DSN")
 }
 
 func GetContextDB(ctx context.Context, c testcontainers.Container, talksConn string, err error, dsn string) (func(), error) {

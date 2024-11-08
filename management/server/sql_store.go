@@ -1112,7 +1112,7 @@ func NewPostgresqlStore(ctx context.Context, dsn string, metrics telemetry.AppMe
 
 // NewMysqlStore creates a new MySQL store.
 func NewMysqlStore(ctx context.Context, dsn string, metrics telemetry.AppMetrics) (*SqlStore, error) {
-	db, err := gorm.Open(mysql.Open(dsn+"?charset=utf8&parseTime=True"), getGormConfig())
+	db, err := gorm.Open(mysql.Open(dsn+"?charset=utf8&parseTime=True"), getGormMysqlConfig())
 	if err != nil {
 		return nil, err
 	}
@@ -1125,6 +1125,15 @@ func getGormConfig() *gorm.Config {
 		Logger:          logger.Default.LogMode(logger.Silent),
 		CreateBatchSize: 400,
 		PrepareStmt:     true,
+	}
+}
+
+func getGormMysqlConfig() *gorm.Config {
+	return &gorm.Config{
+		Logger:          logger.Default.LogMode(logger.Silent),
+		CreateBatchSize: 400,
+		PrepareStmt:     true,
+		SkipDefaultTransaction: true,
 	}
 }
 

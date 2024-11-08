@@ -1205,6 +1205,7 @@ func (am *DefaultAccountManager) handleInactivityExpirationSettings(ctx context.
 	}
 
 	if oldSettings.PeerInactivityExpiration != newSettings.PeerInactivityExpiration {
+		oldSettings.PeerInactivityExpiration = newSettings.PeerInactivityExpiration
 		am.StoreEvent(ctx, userID, accountID, accountID, activity.AccountPeerInactivityExpirationDurationUpdated, nil)
 
 		log.Printf("handleInactivityExpirationSettings - 2 => %s, O1: %s, O2: %s", account.Id, oldSettings.PeerInactivityExpiration, newSettings.PeerInactivityExpiration)

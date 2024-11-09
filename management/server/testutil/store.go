@@ -14,6 +14,8 @@ import (
 	"github.com/testcontainers/testcontainers-go/modules/mysql"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
+	"gorm.io/gorm"
+	mysqlGorm "gorm.io/gorm/mysql"
 )
 
 var mysqlContainer = (*mysql.MySQLContainer)(nil)
@@ -45,12 +47,13 @@ func CreatePGDB() (func(), error) {
 
 func CreateMyDB() (func(), error) {
 
+	ctx := context.Background()
+
 	if mysqlContainer == nil || mysqlContainerString == "" {
 		timeStart := time.Now()
 
 		mysqlConfigPath := "../../management/server/testdata/mysql.cnf"
 
-		ctx := context.Background()
 		c, err := mysql.Run(ctx,
 			"mysql:8.0.40",
 			mysql.WithConfigFile(mysqlConfigPath),
@@ -80,6 +83,14 @@ func CreateMyDB() (func(), error) {
 	}
 
 	log.Printf("MYSQL TRIGGERED!")
+
+	db, err := gorm.Open(mysqlGorm.Open(mysqlContainerString + "?charset=utf8&parseTime=True&loc=Local"))
+	if err != nil {
+		return nil, err
+	}
+
+	db.Exec("DROP DATABASE netbird")
+	db.Exec("CREATE DATABASE netbird")
 
 	os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", mysqlContainerString)
 	return nil, nil

@@ -52,6 +52,8 @@ func CreateMyDB() (func(), error) {
 
 	talksConn, err := c.ConnectionString(ctx)
 
+	os.Setenv("NB_SQL_MAX_OPEN_CONNS", "10")
+
 	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_MYSQL_DSN")
 }
 

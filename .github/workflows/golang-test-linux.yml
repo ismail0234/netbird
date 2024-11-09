@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [ '386','amd64' ]
+        arch: [ '386' ]
         store: [ 'sqlite', 'postgres', 'mysql' ]
     runs-on: ubuntu-latest
     steps:

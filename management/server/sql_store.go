@@ -931,20 +931,33 @@ func NewSqliteStore(ctx context.Context, dataDir string, metrics telemetry.AppMe
 
 // NewPostgresqlStore creates a new Postgres store.
 func NewPostgresqlStore(ctx context.Context, dsn string, metrics telemetry.AppMetrics) (*SqlStore, error) {
+
+	timeStart := time.Now()
 	db, err := gorm.Open(postgres.Open(dsn), getGormConfig())
 	if err != nil {
 		return nil, err
 	}
+
+	timeDuration := time.Since(timeStart)
+
+	log.Printf("NewPostgresqlStore TIME: %s", timeDuration)
 
 	return NewSqlStore(ctx, db, PostgresStoreEngine, metrics)
 }
 
 // NewMysqlStore creates a new MySQL store.
 func NewMysqlStore(ctx context.Context, dsn string, metrics telemetry.AppMetrics) (*SqlStore, error) {
+
+	timeStart := time.Now()
+
 	db, err := gorm.Open(mysql.Open(dsn+"?charset=utf8&parseTime=True&loc=Local"), getGormConfig())
 	if err != nil {
 		return nil, err
 	}
+
+	timeDuration := time.Since(timeStart)
+
+	log.Printf("NewMysqlStore TIME: %s", timeDuration)
 
 	return NewSqlStore(ctx, db, MysqlStoreEngine, metrics)
 }

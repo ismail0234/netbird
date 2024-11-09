@@ -107,9 +107,7 @@ func GetContextDB(ctx context.Context, c testcontainers.Container, talksConn str
 	}
 
 	if clearCleanUp {
-		cleanup = func() {
-			log.WithContext(ctx).Debug("CleanUP Triggered")
-		}
+		cleanup = nil
 	}
 
 	if err != nil {

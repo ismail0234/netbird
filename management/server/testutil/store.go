@@ -107,7 +107,11 @@ func GetContextDB(ctx context.Context, c testcontainers.Container, talksConn str
 	}
 
 	if clearCleanUp {
-		cleanup = nil
+		cleanup := func() {
+			_ = 1
+		}
+
+		return cleanup, os.Setenv(dsn, talksConn)
 	}
 
 	if err != nil {

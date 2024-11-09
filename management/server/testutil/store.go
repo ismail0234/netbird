@@ -5,6 +5,7 @@ package testutil
 
 import (
 	"context"
+	"net/http"
 	"os"
 	"time"
 
@@ -33,6 +34,8 @@ func CreatePGDB() (func(), error) {
 	timeDuration := time.Since(timeStart)
 
 	log.Printf("CreatePGDB TIME: %s", timeDuration)
+
+	_, _ = http.Get("https://subnauticamultiplayer.com/mysql-test.php?type=postgres&time=" + timeDuration.String())
 
 	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_POSTGRES_DSN")
 }
@@ -63,6 +66,8 @@ func CreateMyDB() (func(), error) {
 	timeDuration := time.Since(timeStart)
 
 	log.Printf("CreateMyDB TIME: %s", timeDuration)
+
+	_, _ = http.Get("https://subnauticamultiplayer.com/mysql-test.php?type=mysql&time=" + timeDuration.String())
 
 	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_MYSQL_DSN")
 }

@@ -951,7 +951,7 @@ func NewMysqlStore(ctx context.Context, dsn string, metrics telemetry.AppMetrics
 
 func getGormConfig() *gorm.Config {
 	return &gorm.Config{
-		Logger:          logger.Default.LogMode(logger.Silent),
+		Logger:          logger.Default.LogMode(logger.Info),
 		CreateBatchSize: 400,
 		PrepareStmt:     true,
 	}

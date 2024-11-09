@@ -1902,6 +1902,8 @@ func TestDefaultAccountManager_MarkPeerConnected_PeerLoginExpiration(t *testing.
 	accountID, err := manager.GetAccountIDByUserID(context.Background(), userID, "")
 	require.NoError(t, err, "unable to create an account")
 
+	t.Fatal("BREAK POINT !!!!")
+
 	key, err := wgtypes.GenerateKey()
 	require.NoError(t, err, "unable to generate WireGuard key")
 	_, _, _, err = manager.AddPeer(context.Background(), "", userID, &nbpeer.Peer{

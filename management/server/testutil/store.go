@@ -48,7 +48,7 @@ func CreateMyDB() (func(), error) {
 
 	ctx := context.Background()
 	c, err := mysql.Run(ctx,
-		"mysql:8.0.40",
+		"woahbase/alpine-mysql:latest",
 		mysql.WithConfigFile(mysqlConfigPath),
 		mysql.WithDatabase("netbird"),
 		mysql.WithUsername("netbird"),

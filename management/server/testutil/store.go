@@ -39,7 +39,7 @@ func CreateMyDB() (func(), error) {
 
 	ctx := context.Background()
 	c, err := mysql.Run(ctx,
-		"mysql:8.0.40",
+		"alpine/mysql:15.1",
 		mysql.WithConfigFile(mysqlConfigPath),
 		mysql.WithDatabase("netbird"),
 		mysql.WithUsername("netbird"),
@@ -52,7 +52,7 @@ func CreateMyDB() (func(), error) {
 
 	talksConn, err := c.ConnectionString(ctx)
 
-	os.Setenv("NB_SQL_MAX_OPEN_CONNS", "10")
+	os.Setenv("NB_SQL_MAX_OPEN_CONNS", "25")
 
 	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_MYSQL_DSN")
 }

@@ -92,8 +92,15 @@ func CreateMyDB() (func(), error) {
 	db.Exec("DROP DATABASE netbird")
 	db.Exec("CREATE DATABASE netbird")
 
+	sqlDB, _ := db.DB()
+	sqlDB.Close()
+
+	cleanup := func() {
+		_ = 1
+	}
+
 	os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", mysqlContainerString)
-	return nil, nil
+	return cleanup, nil
 }
 
 func GetContextDB(ctx context.Context, c testcontainers.Container, talksConn string, err error, dsn string, clearCleanUp bool) (func(), error) {

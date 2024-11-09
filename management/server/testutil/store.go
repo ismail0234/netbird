@@ -14,8 +14,8 @@ import (
 	"github.com/testcontainers/testcontainers-go/modules/mysql"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
+	mysqlGorm "gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	mysqlGorm "gorm.io/gorm/mysql"
 )
 
 var mysqlContainer = (*mysql.MySQLContainer)(nil)

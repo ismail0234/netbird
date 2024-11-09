@@ -10,14 +10,13 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/testcontainers/testcontainers-go"
-	"github.com/testcontainers/testcontainers-go/modules/mysql"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
 func CreatePGDB() (func(), error) {
 
-	log.Printf("[DEBUG] CreatePGDB")
+	timeStart := time.Now()
 
 	ctx := context.Background()
 	c, err := postgres.Run(ctx, "postgres:16-alpine", testcontainers.WithWaitStrategy(
@@ -30,20 +29,26 @@ func CreatePGDB() (func(), error) {
 
 	talksConn, err := c.ConnectionString(ctx)
 
+	timeDuration := time.Since(timeStart)
+
+	log.Printf("CreatePGDB TIME: %s", timeDuration)
+
 	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_POSTGRES_DSN")
 }
 
 func CreateMyDB() (func(), error) {
 
+	timeStart := time.Now()
+
 	mysqlConfigPath := "../../management/server/testdata/mysql.cnf"
 
 	ctx := context.Background()
-	c, err := mysql.Run(ctx,
-		"mysql:5.6.40",
-		mysql.WithConfigFile(mysqlConfigPath),
-		mysql.WithDatabase("netbird"),
-		mysql.WithUsername("netbird"),
-		mysql.WithPassword("mysql"),
+	c, err := RunMysqlContainer(ctx,
+		"mysql:8.0.40",
+		WithConfigFile(mysqlConfigPath),
+		WithDatabase("netbird"),
+		WithUsername("netbird"),
+		WithPassword("mysql"),
 	)
 
 	if err != nil {
@@ -53,6 +58,10 @@ func CreateMyDB() (func(), error) {
 	talksConn, err := c.ConnectionString(ctx)
 
 	os.Setenv("NB_SQL_MAX_OPEN_CONNS", "25")
+
+	timeDuration := time.Since(timeStart)
+
+	log.Printf("CreateMyDB TIME: %s", timeDuration)
 
 	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_MYSQL_DSN")
 }

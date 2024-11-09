@@ -25,7 +25,7 @@ jobs:
           go-version: "1.23.x"
           
       - name: Delete huge unnecessary tools folder
-        run: df -h
+        run: rm -rf /opt/hostedtoolcache
 
       - name: Cache Go modules
         uses: actions/cache@v4

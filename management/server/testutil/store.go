@@ -10,6 +10,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/modules/mysql"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
 )
@@ -43,12 +44,12 @@ func CreateMyDB() (func(), error) {
 	mysqlConfigPath := "../../management/server/testdata/mysql.cnf"
 
 	ctx := context.Background()
-	c, err := RunMysqlContainer(ctx,
+	c, err := mysql.Run(ctx,
 		"mysql:8.0.40",
-		WithConfigFile(mysqlConfigPath),
-		WithDatabase("netbird"),
-		WithUsername("netbird"),
-		WithPassword("mysql"),
+		mysql.WithConfigFile(mysqlConfigPath),
+		mysql.WithDatabase("netbird"),
+		mysql.WithUsername("netbird"),
+		mysql.WithPassword("mysql"),
 	)
 
 	if err != nil {

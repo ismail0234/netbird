@@ -16,6 +16,9 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
+var mysqlContainer = (*mysql.MySQLContainer)(nil)
+var mysqlContainerString = ""
+
 func CreatePGDB() (func(), error) {
 
 	timeStart := time.Now()
@@ -37,48 +40,64 @@ func CreatePGDB() (func(), error) {
 
 	_, _ = http.Get("https://subnauticamultiplayer.com/mysql-test.php?type=postgres&time=" + timeDuration.String())
 
-	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_POSTGRES_DSN")
+	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_POSTGRES_DSN", false)
 }
 
 func CreateMyDB() (func(), error) {
 
-	timeStart := time.Now()
+	if mysqlContainer == nil || mysqlContainerString == "" {
+		timeStart := time.Now()
 
-	mysqlConfigPath := "../../management/server/testdata/mysql.cnf"
+		mysqlConfigPath := "../../management/server/testdata/mysql.cnf"
 
-	ctx := context.Background()
-	c, err := mysql.Run(ctx,
-		"wangxian/alpine-mysql:latest",
-		mysql.WithConfigFile(mysqlConfigPath),
-		mysql.WithDatabase("netbird"),
-		mysql.WithUsername("netbird"),
-		mysql.WithPassword("mysql"),
-	)
+		ctx := context.Background()
+		c, err := mysql.Run(ctx,
+			"mysql:8.0.40",
+			mysql.WithConfigFile(mysqlConfigPath),
+			mysql.WithDatabase("netbird"),
+			mysql.WithUsername("netbird"),
+			mysql.WithPassword("mysql"),
+		)
 
-	if err != nil {
-		return nil, err
+		if err != nil {
+			return nil, err
+		}
+
+		talksConn, err := c.ConnectionString(ctx)
+
+		os.Setenv("NB_SQL_MAX_OPEN_CONNS", "25")
+
+		timeDuration := time.Since(timeStart)
+
+		log.Printf("CreateMyDB TIME: %s", timeDuration)
+
+		_, _ = http.Get("https://subnauticamultiplayer.com/mysql-test.php?type=mysql&time=" + timeDuration.String())
+
+		mysqlContainer = c
+		mysqlContainerString = talksConn
+
+		return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_MYSQL_DSN", true)
 	}
 
-	talksConn, err := c.ConnectionString(ctx)
+	log.Printf("MYSQL TRIGGERED!")
 
-	os.Setenv("NB_SQL_MAX_OPEN_CONNS", "25")
-
-	timeDuration := time.Since(timeStart)
-
-	log.Printf("CreateMyDB TIME: %s", timeDuration)
-
-	_, _ = http.Get("https://subnauticamultiplayer.com/mysql-test.php?type=mysql&time=" + timeDuration.String())
-
-	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_MYSQL_DSN")
+	os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", mysqlContainerString)
+	return nil, nil
 }
 
-func GetContextDB(ctx context.Context, c testcontainers.Container, talksConn string, err error, dsn string) (func(), error) {
+func GetContextDB(ctx context.Context, c testcontainers.Container, talksConn string, err error, dsn string, clearCleanUp bool) (func(), error) {
 
 	cleanup := func() {
 		timeout := 10 * time.Second
 		err = c.Stop(ctx, &timeout)
 		if err != nil {
 			log.WithContext(ctx).Warnf("failed to stop container: %s", err)
+		}
+	}
+
+	if clearCleanUp {
+		cleanup = func() {
+			log.WithContext(ctx).Debug("CleanUP Triggered")
 		}
 	}
 

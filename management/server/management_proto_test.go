@@ -472,21 +472,14 @@ func createRawClient(addr string) (mgmtProto.ManagementServiceClient, *grpc.Clie
 
 func Test_SyncStatusRace(t *testing.T) {
 	t.Skip()
-	log.Printf("[DEBUG] Test_SyncStatusRace")
 	if os.Getenv("CI") == "true" {
-		log.Printf("[DEBUG] Test_SyncStatusRace 2")
 		if os.Getenv("NETBIRD_STORE_ENGINE") == "postgres" {
-			log.Printf("[DEBUG] Test_SyncStatusRace 3")
 			t.Skip("Skipping on CI and Postgres store")
 		}
 
 		if os.Getenv("NETBIRD_STORE_ENGINE") == "mysql" {
-
-			log.Printf("[DEBUG] Test_SyncStatusRace 4")
 			t.Skip("Skipping on CI and MySQL store")
 		}
-
-		log.Printf("[DEBUG] Test_SyncStatusRace 5")
 	}
 	for i := 0; i < 500; i++ {
 		t.Run(fmt.Sprintf("TestRun-%d", i), func(t *testing.T) {

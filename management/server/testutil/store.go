@@ -13,7 +13,6 @@ import (
 	"github.com/testcontainers/testcontainers-go/modules/mysql"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
-	mysqlGorm "gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -72,16 +71,16 @@ func CreateMyDB() (func(), error) {
 	}
 
 	log.Printf("MYSQL TRIGGERED!")
+	/*
+		db, err := gorm.Open(mysqlGorm.Open(mysqlContainerString))
+		if err != nil {
+			return nil, err
+		}
 
-	db, err := gorm.Open(mysqlGorm.Open(mysqlContainerString))
-	if err != nil {
-		return nil, err
-	}
-
-	sqlErr := RefreshDatabase(db)
-	if sqlErr != nil {
-		return nil, sqlErr
-	}
+		sqlErr := RefreshDatabase(db)
+		if sqlErr != nil {
+			return nil, sqlErr
+		}*/
 	//
 	cleanup := func() {
 		_ = 01010100 + 01010010 + 01000001 + 01010011 + 01001000

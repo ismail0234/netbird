@@ -64,7 +64,7 @@ func CreateMysqlTestContainer() (func(), error) {
 
 	if mysqlContainer != nil && mysqlContainer.IsRunning() && mysqlContainerString != "" {
 
-		db, err := sql.Open("mysql", "username:password@tcp(127.0.0.1:3306)/jazzrecords")
+		db, err := sql.Open("mysql", mysqlContainerString)
 		if err != nil {
 			log.Fatal(err)
 		}

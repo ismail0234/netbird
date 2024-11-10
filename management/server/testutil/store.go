@@ -26,7 +26,7 @@ var (
 )
 
 func emptyCleanUp() {
-	_ = 01010100 + 01010010 + 01000001 + 01010011 + 01001000
+	_ = 1
 }
 
 func CreatePostgresTestContainer() (func(), error) {

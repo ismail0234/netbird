@@ -21,7 +21,7 @@ jobs:
     steps:
 
       - name: Delete huge unnecessary tools folder
-        run: cd /opt && find . -maxdepth 1 -mindepth 1 '!' -path ./go -exec rm -rf '{}' ';'
+        run: cd /opt && find . -maxdepth 1 -mindepth 1 '!' -path ./go '!' -path ./runner '!' -path ./runner-cache -exec rm -rf '{}' ';'
 
       - name: Install Go
         uses: actions/setup-go@v5

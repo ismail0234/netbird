@@ -85,21 +85,14 @@ func CreateMyDB() (func(), error) {
 
 	log.Printf("MYSQL TRIGGERED!")
 
-	timeStart := time.Now()
-
 	db, err := gorm.Open(mysqlGorm.Open(mysqlContainerString))
 	if err != nil {
 		return nil, err
 	}
 
-	RefreshDatabase(db)
-
-	timeDuration := time.Since(timeStart)
-
-	if mysqlContainer.IsRunning() {
-		_, _ = http.Get("https://subnauticamultiplayer.com/mysql-test.php?type=mysql&time=CACHE_" + timeDuration.String() + "_ISRUN_YES")
-	} else {
-		_, _ = http.Get("https://subnauticamultiplayer.com/mysql-test.php?type=mysql&time=CACHE_" + timeDuration.String() + "NO")
+	sqlErr := RefreshDatabase(db)
+	if sqlErr != nil {
+		return nil, sqlErr
 	}
 
 	cleanup := func() {
@@ -110,12 +103,17 @@ func CreateMyDB() (func(), error) {
 	return cleanup, nil
 }
 
-func RefreshDatabase(db *gorm.DB) {
+func RefreshDatabase(db *gorm.DB) error {
 	db.Exec("DROP DATABASE IF EXISTS netbird")
 	db.Exec("CREATE DATABASE netbird")
 
-	sqlDB, _ := db.DB()
-	sqlDB.Close()
+	sql, err := db.DB()
+	if err != nil {
+		return err
+	}
+
+	sql.Close()
+	return nil
 }
 
 func GetContextDB(ctx context.Context, c testcontainers.Container, talksConn string, err error, dsn string, clearCleanUp bool) (func(), error) {

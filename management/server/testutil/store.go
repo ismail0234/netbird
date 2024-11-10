@@ -81,8 +81,8 @@ func CreateMysqlTestContainer() (func(), error) {
 		"mysql:8.0.40",
 		mysql.WithConfigFile(mysqlContainerConfigPath),
 		mysql.WithDatabase("netbird"),
-		mysql.WithUsername("netbird"),
-		mysql.WithPassword("mysql"),
+		mysql.WithUsername("root"),
+		mysql.WithPassword(""),
 	)
 
 	if err != nil {

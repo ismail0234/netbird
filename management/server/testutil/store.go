@@ -22,7 +22,6 @@ var (
 	mysqlContainer           = (*mysql.MySQLContainer)(nil)
 	mysqlContainerString     = ""
 	mysqlContainerConfigPath = "../../management/server/testdata/mysql.cnf"
-	mysqlConnection          = (*gorm.DB)(nil)
 	postgresContainer        = (*postgres.PostgresContainer)(nil)
 	postgresContainerString  = ""
 )
@@ -66,9 +65,9 @@ func CreateMysqlTestContainer() (func(), error) {
 
 	if mysqlContainerString != "" && mysqlContainer != nil && mysqlContainer.IsRunning() {
 
-		log.Printf("TEST 1: %s", execInMysqlContainer([]string{"mysql", "-v"}))
-		log.Printf("TEST 2: %s", execInMysqlContainer([]string{"ls", "-l"}))
-		log.Printf("TEST 3: %s", execInMysqlContainer([]string{"mysql"}))
+		log.Printf("TEST 1: %s", execInMysqlContainer([]string{"mysqladmin", "-v"}))
+		log.Printf("TEST 2: %s", execInMysqlContainer([]string{"mysqladmin"}))
+		log.Printf("TEST 3: %s", execInMysqlContainer([]string{"mysqladmin --user netbird --password mysql drop netbird"}))
 		log.Fatal("FATAL ERROR! => ")
 
 		return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", mysqlContainerString)

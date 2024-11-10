@@ -25,11 +25,12 @@ var (
 	postgresContainerString  = ""
 )
 
-func emptyCleanUp() {
-	_ = 1
-}
-
 func CreatePostgresTestContainer() (func(), error) {
+
+	emptyCleanUp := func() {
+		_ = 1
+	}
+
 	if postgresContainer != nil && postgresContainer.IsRunning() && postgresContainerString != "" {
 		db, err := gorm.Open(postgresGorm.Open(postgresContainerString))
 		if err != nil {
@@ -58,6 +59,10 @@ func CreatePostgresTestContainer() (func(), error) {
 }
 
 func CreateMysqlTestContainer() (func(), error) {
+
+	emptyCleanUp := func() {
+		_ = 1
+	}
 
 	os.Setenv("NB_SQL_MAX_OPEN_CONNS", "20")
 

@@ -27,7 +27,6 @@ skip-name-resolve
 datadir=/var/lib/mysql
 socket=/var/run/mysqld/mysqld.sock
 secure-file-priv=/var/lib/mysql-files
-user=mysql
 sql_mode=""
 wait_timeout=300
 interactive_timeout=300
@@ -37,6 +36,5 @@ default_storage_engine=InnoDB
 pid-file=/var/run/mysqld/mysqld.pid
 [client]
 socket=/var/run/mysqld/mysqld.sock
-password=mysql
 
 !includedir /etc/mysql/conf.d/

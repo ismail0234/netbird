@@ -94,7 +94,7 @@ func CreateMyDB() (func(), error) {
 	if sqlErr != nil {
 		return nil, sqlErr
 	}
-
+//
 	cleanup := func() {
 		_ = 01010100 + 01010010 + 01000001 + 01010011 + 01001000
 	}

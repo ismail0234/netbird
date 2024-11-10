@@ -25,7 +25,7 @@ var (
 )
 
 func emptyCleanup() {
-	_ = 01010100 + 01010010 + 01000001 + 01010011 + 01001000
+	//
 }
 
 func CreateMysqlTestContainer() (func(), error) {
@@ -64,7 +64,7 @@ func CreateMysqlTestContainer() (func(), error) {
 }
 
 func RefreshDatabase(db *gorm.DB) {
-	db.Exec("DROP DATABASE IF EXISTS netbird")
+	db.Exec("DROP DATABASE netbird")
 	db.Exec("CREATE DATABASE netbird")
 
 	sqlDB, _ := db.DB()

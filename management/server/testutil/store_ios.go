@@ -4,3 +4,5 @@
 package testutil
 
 func CreatePGDB() (func(), error) { return func() {}, nil }
+
+func CreateMysqlTestContainer() (func(), error) { return func() {}, nil }

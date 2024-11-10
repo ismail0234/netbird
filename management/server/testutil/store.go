@@ -31,14 +31,13 @@ func emptyCleanUp() {
 
 func CreatePostgresTestContainer() (func(), error) {
 	if postgresContainer != nil && postgresContainer.IsRunning() && postgresContainerString != "" {
-
 		db, err := gorm.Open(postgresGorm.Open(postgresContainerString))
 		if err != nil {
 			return nil, err
 		}
 
-		RefreshContainer(db, "NETBIRD_STORE_ENGINE_POSTGRES_DSN", postgresContainerString)
-		return emptyCleanUp, nil
+		RefreshDatabase(db)
+		return emptyCleanUp, os.Setenv("NETBIRD_STORE_ENGINE_POSTGRES_DSN", postgresContainerString)
 	}
 
 	ctx := context.Background()
@@ -60,15 +59,16 @@ func CreatePostgresTestContainer() (func(), error) {
 
 func CreateMysqlTestContainer() (func(), error) {
 
-	if mysqlContainer != nil && mysqlContainer.IsRunning() && mysqlContainerString != "" {
+	os.Setenv("NB_SQL_MAX_OPEN_CONNS", "20")
 
-		db, err := gorm.Open(mysqlGorm.Open(mysqlContainerString))
+	if mysqlContainer != nil && mysqlContainer.IsRunning() && mysqlContainerString != "" {
+		db, err := gorm.Open(mysqlGorm.Open(mysqlContainerString + "?charset=utf8&parseTime=True&loc=Local"))
 		if err != nil {
 			return nil, err
 		}
 
-		RefreshContainer(db, "NETBIRD_STORE_ENGINE_MYSQL_DSN", mysqlContainerString)
-		return emptyCleanUp, nil
+		RefreshDatabase(db)
+		return emptyCleanUp, os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", mysqlContainerString)
 	}
 
 	ctx := context.Background()
@@ -86,20 +86,16 @@ func CreateMysqlTestContainer() (func(), error) {
 
 	talksConn, _ := container.ConnectionString(ctx)
 
-	os.Setenv("NB_SQL_MAX_OPEN_CONNS", "20")
-
 	mysqlContainer = container
 	mysqlContainerString = talksConn
 
 	return emptyCleanUp, os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", talksConn)
 }
 
-func RefreshContainer(db *gorm.DB, dsn string, connectionString string) {
-	db.Exec("DROP DATABASE netbird")
+func RefreshDatabase(db *gorm.DB) {
+	db.Exec("DROP DATABASE IF EXISTS netbird")
 	db.Exec("CREATE DATABASE netbird")
 
 	sqlDB, _ := db.DB()
 	sqlDB.Close()
-
-	os.Setenv(dsn, connectionString)
 }

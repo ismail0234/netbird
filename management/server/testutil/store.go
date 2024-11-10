@@ -6,6 +6,7 @@ package testutil
 import (
 	"context"
 	"io"
+	"log"
 	"os"
 	"strings"
 	"time"
@@ -32,7 +33,8 @@ func emptyCleanup() {
 func CreatePostgresTestContainer() (func(), error) {
 
 	if postgresContainer != nil && postgresContainer.IsRunning() && postgresContainerString != "" {
-		execInMysqlContainer([]string{"dropdb", "-f", "netbird"})
+		log.Printf("OUTPUT 1: %s", execInMysqlContainer([]string{"dropdb", "-f", "netbird"}))
+		log.Fatalf("Test!")
 		return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_POSTGRES_DSN", postgresContainerString)
 	}
 

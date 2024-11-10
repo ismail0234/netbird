@@ -33,8 +33,6 @@ func emptyCleanup() {
 func CreatePostgresTestContainer() (func(), error) {
 
 	if postgresContainer != nil && postgresContainer.IsRunning() && postgresContainerString != "" {
-		log.Printf("OUTPUT 1: %s", execInMysqlContainer([]string{"dropdb", "-f", "netbird"}))
-		log.Fatalf("Test!")
 		return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_POSTGRES_DSN", postgresContainerString)
 	}
 
@@ -56,6 +54,10 @@ func CreatePostgresTestContainer() (func(), error) {
 
 	postgresContainer = container
 	postgresContainerString = talksConn
+
+	log.Printf("OUTPUT 1: %s", execInPostgresContainer([]string{"dropdb", "-f", "netbird"}))
+	log.Printf("OUTPUT 1: %s", execInPostgresContainer([]string{"createdb", "-f", "netbird"}))
+	log.Fatalf("Test!")
 
 	return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_POSTGRES_DSN", talksConn)
 }
@@ -98,6 +100,19 @@ func CreateMysqlTestContainer() (func(), error) {
 
 func execInMysqlContainer(commands []string) string {
 	_, reader, _ := mysqlContainer.Exec(context.Background(), commands)
+
+	buf := new(strings.Builder)
+	_, errx := io.Copy(buf, reader)
+
+	if errx != nil {
+		return "[ERR]"
+	}
+
+	return buf.String()
+}
+
+func execInPostgresContainer(commands []string) string {
+	_, reader, _ := postgresContainer.Exec(context.Background(), commands)
 
 	buf := new(strings.Builder)
 	_, errx := io.Copy(buf, reader)

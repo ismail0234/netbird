@@ -5,6 +5,8 @@ package testutil
 
 import (
 	"context"
+	"database/sql"
+	"log"
 	"os"
 	"time"
 
@@ -61,6 +63,16 @@ func CreateMysqlTestContainer() (func(), error) {
 	os.Setenv("NB_SQL_MAX_OPEN_CONNS", "20")
 
 	if mysqlContainer != nil && mysqlContainer.IsRunning() && mysqlContainerString != "" {
+
+		db, err := sql.Open("mysql", "username:password@tcp(127.0.0.1:3306)/jazzrecords")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		db.Exec("DROP DATABASE IF EXISTS netbird")
+		db.Exec("CREATE DATABASE netbird")
+		db.Close()
+
 		/*db, err := gorm.Open(mysqlGorm.Open(mysqlContainerString + "?charset=utf8&parseTime=True&loc=Local"))
 		if err != nil {
 			return nil, err

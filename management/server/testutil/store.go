@@ -5,14 +5,16 @@ package testutil
 
 import (
 	"context"
+	"io"
+	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/mysql"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
-	mysqlGorm "gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -26,13 +28,7 @@ var (
 )
 
 func emptyCleanup() {
-
-	if mysqlConnection != nil {
-		sqlDB, err := mysqlConnection.DB()
-		if err != nil {
-			sqlDB.Close()
-		}
-	}
+	//
 }
 
 func CreatePostgresTestContainer() (func(), error) {
@@ -68,10 +64,19 @@ func CreateMysqlTestContainer() (func(), error) {
 
 	os.Setenv("NB_SQL_MAX_OPEN_CONNS", "20")
 
-	if mysqlContainer != nil && mysqlContainer.IsRunning() && mysqlContainerString != "" {
+	if mysqlContainerString != "" && mysqlContainer != nil && mysqlContainer.IsRunning() {
 
-		mysqlConnection, _ := gorm.Open(mysqlGorm.Open(mysqlContainerString))
-		RefreshDatabase(mysqlConnection)
+		_, reader, _ := mysqlContainer.Exec(context.Background(), []string{"mysql", "-v"})
+
+		buf := new(strings.Builder)
+		_, errx := io.Copy(buf, reader)
+
+		if errx != nil {
+			log.Printf("OUTPUT DATA: %s", buf.String())
+		}
+
+		log.Fatal("FATAL ERROR!")
+
 		return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", mysqlContainerString)
 	}
 

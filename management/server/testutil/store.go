@@ -6,7 +6,6 @@ package testutil
 import (
 	"context"
 	"io"
-	"log"
 	"os"
 	"strings"
 	"time"
@@ -64,7 +63,8 @@ func CreateMysqlTestContainer() (func(), error) {
 	os.Setenv("NB_SQL_MAX_OPEN_CONNS", "20")
 
 	if mysqlContainerString != "" && mysqlContainer != nil && mysqlContainer.IsRunning() {
-
+		execInMysqlContainer([]string{"mysqladmin", "--user=root", "drop", "netbird", "-f"})
+		execInMysqlContainer([]string{"mysqladmin", "--user=root", "create", "netbird"})
 		return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", mysqlContainerString)
 	}
 
@@ -86,9 +86,10 @@ func CreateMysqlTestContainer() (func(), error) {
 	mysqlContainer = container
 	mysqlContainerString = talksConn
 
-	log.Printf("TEST 2: %s", execInMysqlContainer([]string{"mysqladmin", "--user=root", "drop", "netbird", "-f"}))
-	log.Printf("TEST 2: %s", execInMysqlContainer([]string{"mysqladmin", "--user=root", "create", "netbird"}))
-	log.Fatal("FATAL ERROR! => ")
+	execInMysqlContainer([]string{"mysqladmin", "--user=root", "drop", "netbird", "-f"})
+	execInMysqlContainer([]string{"mysqladmin", "--user=root", "create", "netbird"})
+	//log.Printf("TEST 2: %s", execInMysqlContainer([]string{"mysqladmin", "--user=root", "drop", "netbird", "-f"}))
+	//log.Printf("TEST 2: %s", execInMysqlContainer([]string{"mysqladmin", "--user=root", "create", "netbird"}))
 
 	return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", talksConn)
 }

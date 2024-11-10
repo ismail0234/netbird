@@ -94,9 +94,13 @@ func CreateMyDB() (func(), error) {
 	if sqlErr != nil {
 		return nil, sqlErr
 	}
-//
+	//
 	cleanup := func() {
 		_ = 01010100 + 01010010 + 01000001 + 01010011 + 01001000
+	}
+
+	if mysqlContainer.IsRunning() {
+		//
 	}
 
 	os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", mysqlContainerString)

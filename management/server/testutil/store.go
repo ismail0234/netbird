@@ -5,7 +5,6 @@ package testutil
 
 import (
 	"context"
-	"net/http"
 	"os"
 	"time"
 
@@ -22,9 +21,6 @@ var mysqlContainer = (*mysql.MySQLContainer)(nil)
 var mysqlContainerString = ""
 
 func CreatePGDB() (func(), error) {
-
-	timeStart := time.Now()
-
 	ctx := context.Background()
 	c, err := postgres.Run(ctx, "postgres:16-alpine", testcontainers.WithWaitStrategy(
 		wait.ForLog("database system is ready to accept connections").
@@ -36,12 +32,6 @@ func CreatePGDB() (func(), error) {
 
 	talksConn, err := c.ConnectionString(ctx)
 
-	timeDuration := time.Since(timeStart)
-
-	log.Printf("CreatePGDB TIME: %s", timeDuration)
-
-	_, _ = http.Get("https://subnauticamultiplayer.com/mysql-test.php?type=postgres&time=" + timeDuration.String())
-
 	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_POSTGRES_DSN", false)
 }
 
@@ -50,8 +40,6 @@ func CreateMyDB() (func(), error) {
 	ctx := context.Background()
 
 	if mysqlContainer == nil || mysqlContainerString == "" {
-
-		timeStart := time.Now()
 
 		mysqlConfigPath := "../../management/server/testdata/mysql.cnf"
 
@@ -71,16 +59,16 @@ func CreateMyDB() (func(), error) {
 
 		os.Setenv("NB_SQL_MAX_OPEN_CONNS", "25")
 
-		timeDuration := time.Since(timeStart)
-
-		log.Printf("CreateMyDB TIME: %s", timeDuration)
-
-		_, _ = http.Get("https://subnauticamultiplayer.com/mysql-test.php?type=mysql&time=" + timeDuration.String())
-
 		mysqlContainer = c
 		mysqlContainerString = talksConn
 
 		return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_MYSQL_DSN", true)
+	}
+
+	if !mysqlContainer.IsRunning() {
+		if err := mysqlContainer.Start(ctx); err != nil {
+			return nil, err
+		}
 	}
 
 	log.Printf("MYSQL TRIGGERED!")
@@ -97,10 +85,6 @@ func CreateMyDB() (func(), error) {
 	//
 	cleanup := func() {
 		_ = 01010100 + 01010010 + 01000001 + 01010011 + 01001000
-	}
-
-	if mysqlContainer.IsRunning() {
-		//
 	}
 
 	os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", mysqlContainerString)

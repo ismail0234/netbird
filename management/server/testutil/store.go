@@ -30,16 +30,11 @@ func emptyCleanup() {
 }
 
 func CreatePostgresTestContainer() (func(), error) {
-
-	if postgresContainer != nil && postgresContainer.IsRunning() && postgresContainerString != "" {
-		/*	mysqlConnection err := gorm.Open(postgresGorm.Open(postgresContainerString))
-			if err != nil {
-				return nil, err
-			}
-
-			RefreshDatabase(db)*/
-		return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_POSTGRES_DSN", postgresContainerString)
-	}
+	/*
+		if postgresContainer != nil && postgresContainer.IsRunning() && postgresContainerString != "" {
+			execInMysqlContainer([]string{"mysqladmin", "--user=root", "create", "netbird"})
+			return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_POSTGRES_DSN", postgresContainerString)
+		}*/
 
 	ctx := context.Background()
 	container, err := postgres.Run(ctx, "postgres:16-alpine", testcontainers.WithWaitStrategy(
@@ -52,8 +47,8 @@ func CreatePostgresTestContainer() (func(), error) {
 
 	talksConn, _ := container.ConnectionString(ctx)
 
-	postgresContainer = container
-	postgresContainerString = talksConn
+	//postgresContainer = container
+	//postgresContainerString = talksConn
 
 	return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_POSTGRES_DSN", talksConn)
 }

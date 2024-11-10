@@ -67,7 +67,7 @@ func CreateMysqlTestContainer() (func(), error) {
 
 		log.Printf("TEST 1: %s", execInMysqlContainer([]string{"mysqladmin", "-v"}))
 		log.Printf("TEST 2: %s", execInMysqlContainer([]string{"mysqladmin"}))
-		log.Printf("TEST 3: %s", execInMysqlContainer([]string{"mysqladmin --user netbird --password mysql drop netbird"}))
+		log.Printf("TEST 3: %s", execInMysqlContainer([]string{"mysqladmin", "--user netbird --password mysql drop netbird"}))
 		log.Fatal("FATAL ERROR! => ")
 
 		return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", mysqlContainerString)

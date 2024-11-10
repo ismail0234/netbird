@@ -65,14 +65,6 @@ func CreateMysqlTestContainer() (func(), error) {
 
 	if mysqlContainerString != "" && mysqlContainer != nil && mysqlContainer.IsRunning() {
 
-		log.Printf("TEST 1: %s", execInMysqlContainer([]string{"mysqladmin", "--user=root", " --password=mysql", "drop netbird"}))
-		log.Printf("TEST 2: %s", execInMysqlContainer([]string{"mysqladmin", "--user=root", " --password=mysql", "drop", "netbird"}))
-		log.Printf("TEST 3: %s", execInMysqlContainer([]string{"mysqladmin", "--user=root", " --password=mysql", "version"}))
-		log.Printf("TEST 4: %s", execInMysqlContainer([]string{"mysqladmin", "--user=mysql", " --password=mysql", "version"}))
-		log.Printf("TEST 5: %s", execInMysqlContainer([]string{"mysqladmin", "--user=mysql", " --password=", "version"}))
-		log.Printf("TEST 6: %s", execInMysqlContainer([]string{"mysqladmin", "--user=root", " --password=", "version"}))
-		log.Fatal("FATAL ERROR! => ")
-
 		return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", mysqlContainerString)
 	}
 
@@ -93,6 +85,14 @@ func CreateMysqlTestContainer() (func(), error) {
 
 	mysqlContainer = container
 	mysqlContainerString = talksConn
+
+	log.Printf("TEST 1: %s", execInMysqlContainer([]string{"mysqladmin", "--user=root", " --password=mysql", "drop netbird"}))
+	log.Printf("TEST 2: %s", execInMysqlContainer([]string{"mysqladmin", "--user=root", " --password=mysql", "drop", "netbird"}))
+	log.Printf("TEST 3: %s", execInMysqlContainer([]string{"mysqladmin", "--user=root", " --password=mysql", "version"}))
+	log.Printf("TEST 4: %s", execInMysqlContainer([]string{"mysqladmin", "--user=mysql", " --password=mysql", "version"}))
+	log.Printf("TEST 5: %s", execInMysqlContainer([]string{"mysqladmin", "--user=mysql", " --password=", "version"}))
+	log.Printf("TEST 6: %s", execInMysqlContainer([]string{"mysqladmin", "--user=root", "version"}))
+	log.Fatal("FATAL ERROR! => ")
 
 	return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", talksConn)
 }

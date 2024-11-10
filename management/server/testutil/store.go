@@ -30,16 +30,21 @@ func emptyCleanup() {
 }
 
 func CreatePostgresTestContainer() (func(), error) {
-	/*
-		if postgresContainer != nil && postgresContainer.IsRunning() && postgresContainerString != "" {
-			execInMysqlContainer([]string{"mysqladmin", "--user=root", "create", "netbird"})
-			return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_POSTGRES_DSN", postgresContainerString)
-		}*/
+
+	if postgresContainer != nil && postgresContainer.IsRunning() && postgresContainerString != "" {
+		execInMysqlContainer([]string{"dropdb", "-f", "netbird"})
+		return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_POSTGRES_DSN", postgresContainerString)
+	}
 
 	ctx := context.Background()
-	container, err := postgres.Run(ctx, "postgres:16-alpine", testcontainers.WithWaitStrategy(
-		wait.ForLog("database system is ready to accept connections").
-			WithOccurrence(2).WithStartupTimeout(15*time.Second)),
+	container, err := postgres.Run(ctx,
+		"postgres:16-alpine",
+		postgres.WithUsername("netbird"),
+		postgres.WithDatabase("netbird"),
+		postgres.WithPassword("postgres"),
+		testcontainers.WithWaitStrategy(
+			wait.ForLog("database system is ready to accept connections").
+				WithOccurrence(2).WithStartupTimeout(15*time.Second)),
 	)
 	if err != nil {
 		return nil, err
@@ -47,8 +52,8 @@ func CreatePostgresTestContainer() (func(), error) {
 
 	talksConn, _ := container.ConnectionString(ctx)
 
-	//postgresContainer = container
-	//postgresContainerString = talksConn
+	postgresContainer = container
+	postgresContainerString = talksConn
 
 	return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_POSTGRES_DSN", talksConn)
 }

@@ -68,16 +68,18 @@ func CreateMyDB() (func(), error) {
 
 	log.Printf("MYSQL TRIGGERED!")
 
-	db, err := gorm.Open(mysqlGorm.Open(mysqlContainerString + "?charset=utf8&parseTime=True&loc=Local"))
-	if err != nil {
-		return nil, err
+	if mysqlContainer.IsRunning() {
+		db, err := gorm.Open(mysqlGorm.Open(mysqlContainerString + "?charset=utf8&parseTime=True&loc=Local"))
+		if err != nil {
+			return nil, err
+		}
+
+		db.Exec("DROP DATABASE netbird")
+		db.Exec("CREATE DATABASE netbird")
+
+		sqlDB, _ := db.DB()
+		sqlDB.Close()
 	}
-
-	db.Exec("DROP DATABASE netbird")
-	db.Exec("CREATE DATABASE netbird")
-
-	sqlDB, _ := db.DB()
-	sqlDB.Close()
 
 	cleanup := func() {
 		_ = 01010100 + 01010010 + 01000001 + 01010011 + 01001000

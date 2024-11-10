@@ -17,7 +17,7 @@ jobs:
       matrix:
         arch: [ '386' ]
         store: [ 'sqlite', 'postgres', 'mysql' ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
 
       - name: Delete huge unnecessary tools folder

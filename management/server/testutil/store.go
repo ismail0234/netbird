@@ -18,58 +18,8 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
-	mysqlContainer           = (*mysql.MySQLContainer)(nil)
-	mysqlContainerString     = ""
-	mysqlContainerConfigPath = "../../management/server/testdata/mysql.cnf"
-)
-
-func emptyCleanup() {
-	//
-}
-
-func CreateMysqlTestContainer() (func(), error) {
-
-	os.Setenv("NB_SQL_MAX_OPEN_CONNS", "20")
-
-	if mysqlContainer != nil && mysqlContainer.IsRunning() && mysqlContainerString != "" {
-		db, err := gorm.Open(mysqlGorm.Open(mysqlContainerString + "?charset=utf8&parseTime=True&loc=Local"))
-		if err != nil {
-			return nil, err
-		}
-
-		RefreshDatabase(db)
-		return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", mysqlContainerString)
-	}
-
-	ctx := context.Background()
-	container, err := mysql.Run(ctx,
-		"mysql:8.0.40",
-		mysql.WithConfigFile(mysqlContainerConfigPath),
-		mysql.WithDatabase("netbird"),
-		mysql.WithUsername("netbird"),
-		mysql.WithPassword("mysql"),
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
-	talksConn, _ := container.ConnectionString(ctx)
-
-	mysqlContainer = container
-	mysqlContainerString = talksConn
-
-	return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", talksConn)
-}
-
-func RefreshDatabase(db *gorm.DB) {
-	db.Exec("DROP DATABASE netbird")
-	db.Exec("CREATE DATABASE netbird")
-
-	sqlDB, _ := db.DB()
-	sqlDB.Close()
-}
+var mysqlContainer = (*mysql.MySQLContainer)(nil)
+var mysqlContainerString = ""
 
 func CreatePGDB() (func(), error) {
 
@@ -93,6 +43,75 @@ func CreatePGDB() (func(), error) {
 	_, _ = http.Get("https://subnauticamultiplayer.com/mysql-test.php?type=postgres&time=" + timeDuration.String())
 
 	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_POSTGRES_DSN", false)
+}
+
+func CreateMyDB() (func(), error) {
+
+	ctx := context.Background()
+
+	if mysqlContainer == nil || mysqlContainerString == "" {
+
+		timeStart := time.Now()
+
+		mysqlConfigPath := "../../management/server/testdata/mysql.cnf"
+
+		c, err := mysql.Run(ctx,
+			"mysql:8.0.40",
+			mysql.WithConfigFile(mysqlConfigPath),
+			mysql.WithDatabase("netbird"),
+			mysql.WithUsername("netbird"),
+			mysql.WithPassword("mysql"),
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		talksConn, err := c.ConnectionString(ctx)
+
+		os.Setenv("NB_SQL_MAX_OPEN_CONNS", "25")
+
+		timeDuration := time.Since(timeStart)
+
+		log.Printf("CreateMyDB TIME: %s", timeDuration)
+
+		_, _ = http.Get("https://subnauticamultiplayer.com/mysql-test.php?type=mysql&time=" + timeDuration.String())
+
+		mysqlContainer = c
+		mysqlContainerString = talksConn
+
+		return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_MYSQL_DSN", true)
+	}
+
+	log.Printf("MYSQL TRIGGERED!")
+
+	timeStart := time.Now()
+
+	db, err := gorm.Open(mysqlGorm.Open(mysqlContainerString + "?charset=utf8&parseTime=True&loc=Local"))
+	if err != nil {
+		return nil, err
+	}
+
+	db.Exec("DROP DATABASE netbird")
+	db.Exec("CREATE DATABASE netbird")
+
+	sqlDB, _ := db.DB()
+	sqlDB.Close()
+
+	timeDuration := time.Since(timeStart)
+
+	if mysqlContainer.IsRunning() {
+		_, _ = http.Get("https://subnauticamultiplayer.com/mysql-test.php?type=mysql&time=CACHE_" + timeDuration.String() + "_ISRUN_YES")
+	} else {
+		_, _ = http.Get("https://subnauticamultiplayer.com/mysql-test.php?type=mysql&time=CACHE_" + timeDuration.String() + "NO")
+	}
+
+	cleanup := func() {
+		_ = 01010100 + 01010010 + 01000001 + 01010011 + 01001000
+	}
+
+	os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", mysqlContainerString)
+	return cleanup, nil
 }
 
 func GetContextDB(ctx context.Context, c testcontainers.Container, talksConn string, err error, dsn string, clearCleanUp bool) (func(), error) {

@@ -6,7 +6,6 @@ package testutil
 import (
 	"context"
 	"io"
-	"log"
 	"os"
 	"strings"
 	"time"
@@ -32,34 +31,43 @@ func emptyCleanup() {
 
 func CreatePostgresTestContainer() (func(), error) {
 
-	if postgresContainer != nil && postgresContainer.IsRunning() && postgresContainerString != "" {
-		return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_POSTGRES_DSN", postgresContainerString)
-	}
-
 	ctx := context.Background()
-	container, err := postgres.Run(ctx,
-		"postgres:16-alpine",
-		postgres.WithUsername("netbird"),
-		postgres.WithDatabase("netbird"),
-		postgres.WithPassword("postgres"),
-		testcontainers.WithWaitStrategy(
-			wait.ForLog("database system is ready to accept connections").
-				WithOccurrence(2).WithStartupTimeout(15*time.Second)),
+	c, err := postgres.Run(ctx, "postgres:16-alpine", testcontainers.WithWaitStrategy(
+		wait.ForLog("database system is ready to accept connections").
+			WithOccurrence(2).WithStartupTimeout(15*time.Second)),
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	talksConn, _ := container.ConnectionString(ctx)
+	talksConn, err := c.ConnectionString(ctx)
 
-	postgresContainer = container
-	postgresContainerString = talksConn
+	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_POSTGRES_DSN", false)
+}
 
-	log.Printf("OUTPUT 1: %s", execInPostgresContainer([]string{"dropdb", "-f", "netbird"}))
-	log.Printf("OUTPUT 1: %s", execInPostgresContainer([]string{"createdb", "-f", "netbird"}))
-	log.Fatalf("Test!")
+func GetContextDB(ctx context.Context, c testcontainers.Container, talksConn string, err error, dsn string, clearCleanUp bool) (func(), error) {
 
-	return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_POSTGRES_DSN", talksConn)
+	cleanup := func() {
+		timeout := 10 * time.Second
+		err = c.Stop(ctx, &timeout)
+		if err != nil {
+			//	log.WithContext(ctx).Warnf("failed to stop container: %s", err)
+		}
+	}
+
+	if clearCleanUp {
+		cleanup := func() {
+			_ = 1
+		}
+
+		return cleanup, os.Setenv(dsn, talksConn)
+	}
+
+	if err != nil {
+		return cleanup, err
+	}
+
+	return cleanup, os.Setenv(dsn, talksConn)
 }
 
 func CreateMysqlTestContainer() (func(), error) {

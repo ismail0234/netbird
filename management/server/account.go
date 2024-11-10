@@ -1187,7 +1187,7 @@ func (am *DefaultAccountManager) UpdateAccountSettings(ctx context.Context, acco
 }
 
 func (am *DefaultAccountManager) handleInactivityExpirationSettings(ctx context.Context, account *Account, oldSettings, newSettings *Settings, userID, accountID string) error {
-	
+
 	if newSettings.PeerInactivityExpirationEnabled {
 		if oldSettings.PeerInactivityExpiration != newSettings.PeerInactivityExpiration {
 			oldSettings.PeerInactivityExpiration = newSettings.PeerInactivityExpiration

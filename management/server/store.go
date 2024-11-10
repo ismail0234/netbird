@@ -310,7 +310,7 @@ func getSqlStoreEngine(ctx context.Context, store *SqlStore, kind StoreEngine) (
 	}
 
 	if kind == MysqlStoreEngine {
-		cleanUp, err := testutil.CreateMyDB()
+		cleanUp, err := testutil.CreateOrGetMysqlTestContainer()
 		if err != nil {
 			return nil, nil, err
 		}

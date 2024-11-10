@@ -5,8 +5,6 @@ package testutil
 
 import (
 	"context"
-	"database/sql"
-	"log"
 	"os"
 	"time"
 
@@ -14,6 +12,7 @@ import (
 	"github.com/testcontainers/testcontainers-go/modules/mysql"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
+	mysqlGorm "gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -21,23 +20,30 @@ var (
 	mysqlContainer           = (*mysql.MySQLContainer)(nil)
 	mysqlContainerString     = ""
 	mysqlContainerConfigPath = "../../management/server/testdata/mysql.cnf"
+	mysqlConnection          = (*gorm.DB)(nil)
 	postgresContainer        = (*postgres.PostgresContainer)(nil)
 	postgresContainerString  = ""
 )
 
 func emptyCleanup() {
-	// Empty Function
+
+	if mysqlConnection != nil {
+		sqlDB, err := mysqlConnection.DB()
+		if err != nil {
+			sqlDB.Close()
+		}
+	}
 }
 
 func CreatePostgresTestContainer() (func(), error) {
 
 	if postgresContainer != nil && postgresContainer.IsRunning() && postgresContainerString != "" {
-		/*db, err := gorm.Open(postgresGorm.Open(postgresContainerString))
-		if err != nil {
-			return nil, err
-		}
+		/*	mysqlConnection err := gorm.Open(postgresGorm.Open(postgresContainerString))
+			if err != nil {
+				return nil, err
+			}
 
-		RefreshDatabase(db)*/
+			RefreshDatabase(db)*/
 		return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_POSTGRES_DSN", postgresContainerString)
 	}
 
@@ -64,21 +70,8 @@ func CreateMysqlTestContainer() (func(), error) {
 
 	if mysqlContainer != nil && mysqlContainer.IsRunning() && mysqlContainerString != "" {
 
-		db, err := sql.Open("mysql", mysqlContainerString)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		db.Exec("DROP DATABASE IF EXISTS netbird")
-		db.Exec("CREATE DATABASE netbird")
-		db.Close()
-
-		/*db, err := gorm.Open(mysqlGorm.Open(mysqlContainerString + "?charset=utf8&parseTime=True&loc=Local"))
-		if err != nil {
-			return nil, err
-		}
-
-		RefreshDatabase(db)*/
+		mysqlConnection, _ := gorm.Open(mysqlGorm.Open(mysqlContainerString))
+		RefreshDatabase(mysqlConnection)
 		return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", mysqlContainerString)
 	}
 
@@ -106,7 +99,4 @@ func CreateMysqlTestContainer() (func(), error) {
 func RefreshDatabase(db *gorm.DB) {
 	db.Exec("DROP DATABASE IF EXISTS netbird")
 	db.Exec("CREATE DATABASE netbird")
-
-	sqlDB, _ := db.DB()
-	sqlDB.Close()
 }

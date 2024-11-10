@@ -32,12 +32,11 @@ sql_mode=""
 wait_timeout=300
 interactive_timeout=300
 innodb_flush_log_at_trx_commit=2
-default_storage_engine = InnoDB
+default_storage_engine=InnoDB
 
 pid-file=/var/run/mysqld/mysqld.pid
 [client]
 socket=/var/run/mysqld/mysqld.sock
-user=root
 password=mysql
 
 !includedir /etc/mysql/conf.d/

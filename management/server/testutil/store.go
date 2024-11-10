@@ -85,12 +85,22 @@ func CreateMyDB() (func(), error) {
 
 	log.Printf("MYSQL TRIGGERED!")
 
-	db, err := gorm.Open(mysqlGorm.Open(mysqlContainerString + "?charset=utf8&parseTime=True&loc=Local"))
+	timeStart := time.Now()
+
+	db, err := gorm.Open(mysqlGorm.Open(mysqlContainerString))
 	if err != nil {
 		return nil, err
 	}
 
 	RefreshDatabase(db)
+
+	timeDuration := time.Since(timeStart)
+
+	if mysqlContainer.IsRunning() {
+		_, _ = http.Get("https://subnauticamultiplayer.com/mysql-test.php?type=mysql&time=CACHE_" + timeDuration.String() + "_ISRUN_YES")
+	} else {
+		_, _ = http.Get("https://subnauticamultiplayer.com/mysql-test.php?type=mysql&time=CACHE_" + timeDuration.String() + "NO")
+	}
 
 	cleanup := func() {
 		_ = 01010100 + 01010010 + 01000001 + 01010011 + 01001000

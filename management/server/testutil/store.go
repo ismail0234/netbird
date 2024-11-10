@@ -86,9 +86,8 @@ func CreateMysqlTestContainer() (func(), error) {
 	mysqlContainer = container
 	mysqlContainerString = talksConn
 
-	log.Printf("TEST 1: %s", execInMysqlContainer([]string{"mysqladmin", "--user=root", "drop netbird"}))
-	log.Printf("TEST 2: %s", execInMysqlContainer([]string{"mysqladmin", "--user=root", "drop", "netbird"}))
-	log.Printf("TEST 6: %s", execInMysqlContainer([]string{"mysqladmin", "--user=root", "version"}))
+	log.Printf("TEST 2: %s", execInMysqlContainer([]string{"mysqladmin", "--user=root", "drop", "netbird", "-f"}))
+	log.Printf("TEST 2: %s", execInMysqlContainer([]string{"mysqladmin", "--user=root", "create", "netbird"}))
 	log.Fatal("FATAL ERROR! => ")
 
 	return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", talksConn)

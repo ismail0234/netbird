@@ -66,16 +66,10 @@ func CreateMysqlTestContainer() (func(), error) {
 
 	if mysqlContainerString != "" && mysqlContainer != nil && mysqlContainer.IsRunning() {
 
-		_, reader, _ := mysqlContainer.Exec(context.Background(), []string{"mysql", "-v"})
-
-		buf := new(strings.Builder)
-		_, errx := io.Copy(buf, reader)
-
-		if errx != nil {
-			log.Printf("OUTPUT DATA: %s", buf.String())
-		}
-
-		log.Fatal("FATAL ERROR!")
+		log.Printf("TEST 1: %s", execInMysqlContainer([]string{"mysql", "-v"}))
+		log.Printf("TEST 2: %s", execInMysqlContainer([]string{"ls", "-l"}))
+		log.Printf("TEST 3: %s", execInMysqlContainer([]string{"mysql"}))
+		log.Fatal("FATAL ERROR! => ")
 
 		return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", mysqlContainerString)
 	}
@@ -99,6 +93,19 @@ func CreateMysqlTestContainer() (func(), error) {
 	mysqlContainerString = talksConn
 
 	return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", talksConn)
+}
+
+func execInMysqlContainer(commands []string) string {
+	_, reader, _ := mysqlContainer.Exec(context.Background(), commands)
+
+	buf := new(strings.Builder)
+	_, errx := io.Copy(buf, reader)
+
+	if errx != nil {
+		return "[ERR]"
+	}
+
+	return buf.String()
 }
 
 func RefreshDatabase(db *gorm.DB) {

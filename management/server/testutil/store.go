@@ -5,10 +5,7 @@ package testutil
 
 import (
 	"context"
-	"io"
-	"log"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/testcontainers/testcontainers-go"
@@ -67,7 +64,13 @@ func RefreshMysqlDatabase(ctx context.Context) {
 func CreatePostgresTestContainer() (func(), error) {
 
 	ctx := context.Background()
-	c, err := postgres.Run(ctx,
+
+	if postgresContainerString != "" && postgresContainer != nil && postgresContainer.IsRunning() {
+		RefreshPostgresDatabase(ctx)
+		return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_POSTGRES_DSN", postgresContainerString)
+	}
+
+	container, err := postgres.Run(ctx,
 		"postgres:16-alpine",
 		postgres.WithDatabase("netbird"),
 		postgres.WithUsername("root"),
@@ -80,51 +83,16 @@ func CreatePostgresTestContainer() (func(), error) {
 		return nil, err
 	}
 
-	talksConn, _ := c.ConnectionString(ctx)
+	talksConn, _ := container.ConnectionString(ctx)
 
-	postgresContainer = c
+	postgresContainerString = talksConn
+	postgresContainer = container
 
-	log.Printf("OUTPUT: %s", execInPostgresContainer([]string{"dropdb", "-f", "netbird"}))
-	log.Printf("OUTPUT 2: %s", execInPostgresContainer([]string{"createdb", "netbird"}))
-
-	log.Fatalf("FATAL")
-	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_POSTGRES_DSN", false)
+	RefreshPostgresDatabase(ctx)
+	return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_POSTGRES_DSN", postgresContainerString)
 }
 
-func execInPostgresContainer(commands []string) string {
-	_, reader, _ := postgresContainer.Exec(context.Background(), commands)
-
-	buf := new(strings.Builder)
-	_, errx := io.Copy(buf, reader)
-
-	if errx != nil {
-		return "[ERR]"
-	}
-
-	return buf.String()
-}
-
-func GetContextDB(ctx context.Context, c testcontainers.Container, talksConn string, err error, dsn string, clearCleanUp bool) (func(), error) {
-
-	cleanup := func() {
-		timeout := 10 * time.Second
-		err = c.Stop(ctx, &timeout)
-		if err != nil {
-			//	log.WithContext(ctx).Warnf("failed to stop container: %s", err)
-		}
-	}
-
-	if clearCleanUp {
-		cleanup := func() {
-			_ = 1
-		}
-
-		return cleanup, os.Setenv(dsn, talksConn)
-	}
-
-	if err != nil {
-		return cleanup, err
-	}
-
-	return cleanup, os.Setenv(dsn, talksConn)
+func RefreshPostgresDatabase(ctx context.Context) {
+	postgresContainer.Exec(ctx, []string{"dropdb", "-f", "netbird"})
+	postgresContainer.Exec(ctx, []string{"createdb", "netbird"})
 }

@@ -56,11 +56,6 @@ func CreateMysqlTestContainer() (func(), error) {
 	return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", talksConn)
 }
 
-func RefreshMysqlDatabase(ctx context.Context) {
-	mysqlContainer.Exec(ctx, []string{"mysqladmin", "--user=root", "drop", "netbird", "-f"})
-	mysqlContainer.Exec(ctx, []string{"mysqladmin", "--user=root", "create", "netbird"})
-}
-
 func CreatePostgresTestContainer() (func(), error) {
 
 	ctx := context.Background()
@@ -92,7 +87,12 @@ func CreatePostgresTestContainer() (func(), error) {
 	return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_POSTGRES_DSN", postgresContainerString)
 }
 
+func RefreshMysqlDatabase(ctx context.Context) {
+	_, _, _ = mysqlContainer.Exec(ctx, []string{"mysqladmin", "--user=root", "drop", "netbird", "-f"})
+	_, _, _ = mysqlContainer.Exec(ctx, []string{"mysqladmin", "--user=root", "create", "netbird"})
+}
+
 func RefreshPostgresDatabase(ctx context.Context) {
-	postgresContainer.Exec(ctx, []string{"dropdb", "-f", "netbird"})
-	postgresContainer.Exec(ctx, []string{"createdb", "netbird"})
+	_, _, _ = postgresContainer.Exec(ctx, []string{"dropdb", "-f", "netbird"})
+	_, _, _ = postgresContainer.Exec(ctx, []string{"createdb", "netbird"})
 }

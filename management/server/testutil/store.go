@@ -5,7 +5,10 @@ package testutil
 
 import (
 	"context"
+	"io"
+	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/testcontainers/testcontainers-go"
@@ -64,9 +67,14 @@ func RefreshMysqlDatabase(ctx context.Context) {
 func CreatePostgresTestContainer() (func(), error) {
 
 	ctx := context.Background()
-	c, err := postgres.Run(ctx, "postgres:16-alpine", testcontainers.WithWaitStrategy(
-		wait.ForLog("database system is ready to accept connections").
-			WithOccurrence(2).WithStartupTimeout(15*time.Second)),
+	c, err := postgres.Run(ctx,
+		"postgres:16-alpine",
+		postgres.WithUsername("root"),
+		postgres.WithDatabase("netbird"),
+		postgres.WithPassword(""),
+		testcontainers.WithWaitStrategy(
+			wait.ForLog("database system is ready to accept connections").
+				WithOccurrence(2).WithStartupTimeout(15*time.Second)),
 	)
 	if err != nil {
 		return nil, err
@@ -74,7 +82,25 @@ func CreatePostgresTestContainer() (func(), error) {
 
 	talksConn, err := c.ConnectionString(ctx)
 
+	postgresContainer = c
+
+	log.Printf("OUTPUT: %s", execInPostgresContainer([]string{"dropdb", "-f", "netbird"}))
+
+	log.Fatalf("FATAL")
 	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_POSTGRES_DSN", false)
+}
+
+func execInPostgresContainer(commands []string) string {
+	_, reader, _ := postgresContainer.Exec(context.Background(), commands)
+
+	buf := new(strings.Builder)
+	_, errx := io.Copy(buf, reader)
+
+	if errx != nil {
+		return "[ERR]"
+	}
+
+	return buf.String()
 }
 
 func GetContextDB(ctx context.Context, c testcontainers.Container, talksConn string, err error, dsn string, clearCleanUp bool) (func(), error) {

@@ -85,6 +85,7 @@ func CreatePostgresTestContainer() (func(), error) {
 	postgresContainer = c
 
 	log.Printf("OUTPUT: %s", execInPostgresContainer([]string{"dropdb", "-f", "netbird"}))
+	log.Printf("OUTPUT 2: %s", execInPostgresContainer([]string{"createdb", "netbird"}))
 
 	log.Fatalf("FATAL")
 	return GetContextDB(ctx, c, talksConn, err, "NETBIRD_STORE_ENGINE_POSTGRES_DSN", false)

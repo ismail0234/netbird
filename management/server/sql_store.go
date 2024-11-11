@@ -967,6 +967,7 @@ func getGormConfig() *gorm.Config {
 		Logger:          logger.Default.LogMode(logger.Silent),
 		CreateBatchSize: 400,
 		PrepareStmt:     true,
+		SkipDefaultTransaction: true,
 	}
 }
 

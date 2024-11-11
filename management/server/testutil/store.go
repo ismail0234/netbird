@@ -69,9 +69,9 @@ func CreatePostgresTestContainer() (func(), error) {
 	ctx := context.Background()
 	c, err := postgres.Run(ctx,
 		"postgres:16-alpine",
-		postgres.WithUsername("root"),
 		postgres.WithDatabase("netbird"),
-		postgres.WithPassword(""),
+		postgres.WithUsername("root"),
+		postgres.WithPassword("netbird"),
 		testcontainers.WithWaitStrategy(
 			wait.ForLog("database system is ready to accept connections").
 				WithOccurrence(2).WithStartupTimeout(15*time.Second)),
@@ -80,7 +80,7 @@ func CreatePostgresTestContainer() (func(), error) {
 		return nil, err
 	}
 
-	talksConn, err := c.ConnectionString(ctx)
+	talksConn, _ := c.ConnectionString(ctx)
 
 	postgresContainer = c
 

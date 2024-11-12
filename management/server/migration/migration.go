@@ -210,8 +210,12 @@ func MigrateNetIPFieldFromBlobToJSON[T any](ctx context.Context, db *gorm.DB, fi
 }
 
 func MigrateSetupKeyToHashedSetupKey[T any](ctx context.Context, db *gorm.DB) error {
+
 	oldColumnName := "key"
 	newColumnName := "key_secret"
+
+	log.Printf("TYPE - IS TYPE: %s", db.Name())
+	log.Fatal("FATAL!")
 
 	var model T
 

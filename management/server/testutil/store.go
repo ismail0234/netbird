@@ -31,7 +31,7 @@ func CreateMysqlTestContainer() (func(), error) {
 	ctx := context.Background()
 
 	if mysqlContainerString != "" && mysqlContainer != nil && mysqlContainer.IsRunning() {
-		//RefreshMysqlDatabase(ctx)
+		RefreshMysqlDatabase(ctx)
 		return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", mysqlContainerString)
 	}
 
@@ -52,7 +52,7 @@ func CreateMysqlTestContainer() (func(), error) {
 	mysqlContainer = container
 	mysqlContainerString = talksConn
 
-	// RefreshMysqlDatabase(ctx)
+	RefreshMysqlDatabase(ctx)
 	return emptyCleanup, os.Setenv("NETBIRD_STORE_ENGINE_MYSQL_DSN", talksConn)
 }
 

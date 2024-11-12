@@ -17,12 +17,21 @@ import (
 	"gorm.io/gorm"
 )
 
+func GetColumnName(db *gorm.DB, column string) string {
+
+	if db.Name() == "mysql" {
+		return fmt.Sprintf("`%s`", column)
+	}
+
+	return column
+}
+
 // MigrateFieldFromGobToJSON migrates a column from Gob encoding to JSON encoding.
 // T is the type of the model that contains the field to be migrated.
 // S is the type of the field to be migrated.
 func MigrateFieldFromGobToJSON[T any, S any](ctx context.Context, db *gorm.DB, fieldName string) error {
-
-	oldColumnName := GetColumnName(db, fieldName)
+	orgColumnName := fieldName
+	oldColumnName := GetColumnName(db, orgColumnName)
 	newColumnName := fieldName + "_tmp"
 
 	var model T
@@ -72,7 +81,7 @@ func MigrateFieldFromGobToJSON[T any, S any](ctx context.Context, db *gorm.DB, f
 		for _, row := range rows {
 			var field S
 
-			str, ok := row[oldColumnName].(string)
+			str, ok := row[orgColumnName].(string)
 			if !ok {
 				return fmt.Errorf("type assertion failed")
 			}
@@ -111,7 +120,8 @@ func MigrateFieldFromGobToJSON[T any, S any](ctx context.Context, db *gorm.DB, f
 // MigrateNetIPFieldFromBlobToJSON migrates a Net IP column from Blob encoding to JSON encoding.
 // T is the type of the model that contains the field to be migrated.
 func MigrateNetIPFieldFromBlobToJSON[T any](ctx context.Context, db *gorm.DB, fieldName string, indexName string) error {
-	oldColumnName := GetColumnName(db, fieldName)
+	orgColumnName := fieldName
+	oldColumnName := GetColumnName(db, orgColumnName)
 	newColumnName := fieldName + "_tmp"
 
 	var model T
@@ -163,7 +173,7 @@ func MigrateNetIPFieldFromBlobToJSON[T any](ctx context.Context, db *gorm.DB, fi
 
 		for _, row := range rows {
 			var blobValue string
-			if columnValue := row[oldColumnName]; columnValue != nil {
+			if columnValue := row[orgColumnName]; columnValue != nil {
 				value, ok := columnValue.(string)
 				if !ok {
 					return fmt.Errorf("type assertion failed")
@@ -209,18 +219,10 @@ func MigrateNetIPFieldFromBlobToJSON[T any](ctx context.Context, db *gorm.DB, fi
 	return nil
 }
 
-func GetColumnName(db *gorm.DB, column string) string {
-
-	if db.Name() == "mysql" {
-		return fmt.Sprintf("`%s`", column)
-	}
-
-	return column
-}
-
 func MigrateSetupKeyToHashedSetupKey[T any](ctx context.Context, db *gorm.DB) error {
 
-	oldColumnName := GetColumnName(db, "key")
+	orgColumnName := key
+	oldColumnName := GetColumnName(db, orgColumnName)
 	newColumnName := "key_secret"
 
 	var model T
@@ -261,20 +263,8 @@ func MigrateSetupKeyToHashedSetupKey[T any](ctx context.Context, db *gorm.DB) er
 
 		for _, row := range rows {
 
-			log.Printf("ROW TRIGGERED!")
-			columnValue_2 := row["key"]
-
-			log.Printf("columnValue_1: %s", columnValue_2)
-
-			columnValue_1 := row[oldColumnName]
-			log.Printf("columnValue_1: %s", columnValue_1)
-
-			if db.Name() == "mysql" {
-				log.Fatal("FATAL");
-			}
-
 			var plainKey string
-			if columnValue := row[oldColumnName]; columnValue != nil {
+			if columnValue := row[orgColumnName]; columnValue != nil {
 				value, ok := columnValue.(string)
 				if !ok {
 					return fmt.Errorf("type assertion failed")

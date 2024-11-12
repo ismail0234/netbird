@@ -223,9 +223,6 @@ func MigrateSetupKeyToHashedSetupKey[T any](ctx context.Context, db *gorm.DB) er
 	oldColumnName := GetColumnName(db, "key")
 	newColumnName := "key_secret"
 
-	log.Printf("TYPE - IS TYPE: %s", db.Name())
-	log.Fatal("FATAL!")
-
 	var model T
 
 	if !db.Migrator().HasTable(&model) {

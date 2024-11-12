@@ -221,7 +221,7 @@ func MigrateNetIPFieldFromBlobToJSON[T any](ctx context.Context, db *gorm.DB, fi
 
 func MigrateSetupKeyToHashedSetupKey[T any](ctx context.Context, db *gorm.DB) error {
 
-	orgColumnName := key
+	orgColumnName := "key"
 	oldColumnName := GetColumnName(db, orgColumnName)
 	newColumnName := "key_secret"
 

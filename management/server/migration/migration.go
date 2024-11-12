@@ -294,7 +294,7 @@ func MigrateSetupKeyToHashedSetupKey[T any](ctx context.Context, db *gorm.DB) er
 				return fmt.Errorf("update row with hashed key: %w", err)
 			}
 		}
-
+		//
 		if err := tx.Exec(fmt.Sprintf("ALTER TABLE %s DROP COLUMN %s", "peers", "setup_key")).Error; err != nil {
 			log.WithContext(ctx).Errorf("Failed to drop column %s: %v", "setup_key", err)
 		}

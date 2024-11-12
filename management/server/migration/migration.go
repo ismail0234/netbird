@@ -269,6 +269,10 @@ func MigrateSetupKeyToHashedSetupKey[T any](ctx context.Context, db *gorm.DB) er
 			columnValue_1 := row[oldColumnName]
 			log.Printf("columnValue_1: %s", columnValue_1)
 
+			if db.Name() == "mysql" {
+				log.Fatal("FATAL");
+			}
+
 			var plainKey string
 			if columnValue := row[oldColumnName]; columnValue != nil {
 				value, ok := columnValue.(string)

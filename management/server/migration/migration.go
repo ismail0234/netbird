@@ -22,7 +22,7 @@ import (
 // S is the type of the field to be migrated.
 func MigrateFieldFromGobToJSON[T any, S any](ctx context.Context, db *gorm.DB, fieldName string) error {
 
-	oldColumnName := fieldName
+	oldColumnName := GetColumnName(db, fieldName)
 	newColumnName := fieldName + "_tmp"
 
 	var model T
@@ -111,7 +111,7 @@ func MigrateFieldFromGobToJSON[T any, S any](ctx context.Context, db *gorm.DB, f
 // MigrateNetIPFieldFromBlobToJSON migrates a Net IP column from Blob encoding to JSON encoding.
 // T is the type of the model that contains the field to be migrated.
 func MigrateNetIPFieldFromBlobToJSON[T any](ctx context.Context, db *gorm.DB, fieldName string, indexName string) error {
-	oldColumnName := fieldName
+	oldColumnName := GetColumnName(db, fieldName)
 	newColumnName := fieldName + "_tmp"
 
 	var model T
@@ -209,9 +209,18 @@ func MigrateNetIPFieldFromBlobToJSON[T any](ctx context.Context, db *gorm.DB, fi
 	return nil
 }
 
+func GetColumnName(db *gorm.DB, column string) string {
+
+	if db.Name() == "mysql" {
+		return fmt.Sprintf("`%s`", column)
+	}
+
+	return column
+}
+
 func MigrateSetupKeyToHashedSetupKey[T any](ctx context.Context, db *gorm.DB) error {
 
-	oldColumnName := "key"
+	oldColumnName := GetColumnName(db, "key")
 	newColumnName := "key_secret"
 
 	log.Printf("TYPE - IS TYPE: %s", db.Name())
@@ -254,6 +263,15 @@ func MigrateSetupKeyToHashedSetupKey[T any](ctx context.Context, db *gorm.DB) er
 		}
 
 		for _, row := range rows {
+
+			log.Printf("ROW TRIGGERED!")
+			columnValue_2 := row["key"]
+
+			log.Printf("columnValue_1: %s", columnValue_2)
+
+			columnValue_1 := row[oldColumnName]
+			log.Printf("columnValue_1: %s", columnValue_1)
+
 			var plainKey string
 			if columnValue := row[oldColumnName]; columnValue != nil {
 				value, ok := columnValue.(string)
